@@ -1,0 +1,46 @@
+{
+  "name": "@zerodev/cab-sdk",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./_cjs/index.js",
+  "module": "./_esm/index.js",
+  "types": "./_types/index.d.ts",
+  "typings": "./_types/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "_esm",
+    "_cjs",
+    "_types",
+    "./src/**/*.ts",
+    "!_esm/**/*.tsbuildinfo",
+    "!_cjs/**/*.tsbuildinfo",
+    "!_types/**/*.tsbuildinfo",
+    "!src/**/*.test.ts"
+  ],
+  "scripts": {
+    "build": "bun run clean && bun run build:cjs && bun run build:esm && bun run build:types",
+    "build:cjs": "tsc --project ./tsconfig.build.json --module NodeNext --moduleResolution NodeNext --outDir ./_cjs --removeComments && printf '{\"type\":\"commonjs\"}' > ./_cjs/package.json",
+    "build:esm": "tsc --project ./tsconfig.build.json --module NodeNext --moduleResolution NodeNext --outDir ./_esm && printf '{\"type\": \"module\",\"sideEffects\":false}' > ./_esm/package.json",
+    "build:types": "tsc --project ./tsconfig.build.json --module NodeNext --moduleResolution NodeNext --declarationDir ./_types --emitDeclarationOnly --declaration --declarationMap",
+    "clean": "rm -rf _esm _cjs _types",
+    "format": "biome format . --write",
+    "lint": "biome check .",
+    "lint:fix": "biome check . --apply"
+  },
+  "exports": {
+    ".": {
+      "types": "./_types/index.d.ts",
+      "import": "./_esm/index.js",
+      "default": "./_cjs/index.js"
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.4.1",
+    "bun-types": "latest",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "@zerodev/sdk": "^5.4.2",
+    "viem": "^2.21.40"
+  }
+}

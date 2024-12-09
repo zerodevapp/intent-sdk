@@ -1,0 +1,22 @@
+# Build directories
+_cjs/
+_esm/
+_types/
+
+# Dependencies
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+
+# OS
+.DS_Store
+
