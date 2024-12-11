@@ -8,3 +8,13 @@ export type {
   GetIntentParameters,
   GetIntentReturnType,
 } from "./actions/getIntent.js";
+export type {
+  SendUserIntentParameters,
+  SendUserIntentResult,
+} from "./actions/sendUserIntent.js";
+export type {
+  GetUserIntentStatusParameters,
+  GetUserIntentStatusResult,
+  UserIntentStatus,
+  Transaction,
+} from "./actions/getUserIntentStatus.js";
