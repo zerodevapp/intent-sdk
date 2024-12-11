@@ -15,33 +15,70 @@ import { createCabClient } from '@zerodev/cab-sdk'
 import { mainnet } from 'viem/chains'
 
 const client = createCabClient({
-  projectId: 'your-project-id',
   chain: mainnet,
-  // ... other KernelClient options
+  bundlerTransport: http(),
+  // Optional transports
+  intentTransport: http(),
+  relayerTransport: http(),
 })
 
-// Bridge tokens across chains
-const bridgeResult = await client.actions.bridgeTokens({
-  sourceToken: '0x...',
-  destinationToken: '0x...',
-  amount: 1000000n,
-  destinationChain: optimism
+// Flow 1: Direct send
+const result1 = await client.sendUserIntent({
+  calls: [{
+    to: '0x...',
+    value: 0n,
+    data: '0x...'
+  }],
+  inputTokens: [{
+    address: '0x...',
+    amount: 1000000n,
+    chainId: 1
+  }],
+  outputTokens: [{
+    address: '0x...',
+    amount: 900000n,
+    chainId: 10
+  }]
 })
 
-// Swap tokens on the same chain
-const swapResult = await client.actions.swapTokens({
-  tokenIn: '0x...',
-  tokenOut: '0x...',
-  amountIn: 1000000n,
-  minAmountOut: 900000n
+// Flow 2: Prepare then send
+// First prepare the intent
+const intent = await client.prepareUserIntent({
+  calls: [{
+    to: '0x...',
+    value: 0n,
+    data: '0x...'
+  }],
+  inputTokens: [{
+    address: '0x...',
+    amount: 1000000n,
+    chainId: 1
+  }],
+  outputTokens: [{
+    address: '0x...',
+    amount: 900000n,
+    chainId: 10
+  }]
+})
+
+// Then send the prepared intent
+const result2 = await client.sendUserIntent({
+  intent
+})
+
+// Check intent status (works for both flows)
+const status = await client.getUserIntentStatus({
+  uiHash: result1.uiHash // or result2.uiHash
 })
 ```
 
 ## Features
 
 - Extends ZeroDev's KernelClient with chain abstraction capabilities
-- Cross-chain token bridging
-- Token swapping via DEX aggregators
+- Cross-chain user intent preparation and execution
+  - Direct send flow
+  - Prepare-then-send flow
+- Intent status tracking
 - Type-safe API
 - Built with Bun and TypeScript
 
