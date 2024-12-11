@@ -12,21 +12,41 @@ import {
   type SmartAccount,
   type BundlerActions,
   type BundlerClientConfig,
-  type PrepareUserOperationParameters,
   bundlerActions,
+  type PrepareUserOperationParameters,
 } from "viem/account-abstraction";
-import { type SmartAccountClientConfig, type KernelAccountClientActions, kernelAccountClientActions } from "@zerodev/sdk";
-import type { CabClientActions } from "../types/actions.js";
-import { cabClientActions } from "./decorators/cab.js";
-import type { CabRpcSchema } from "../types/rpc.js";
+import {
+  type SmartAccountClientConfig,
+  type KernelAccountClientActions,
+  kernelAccountClientActions,
+} from "@zerodev/sdk";
+import { cabClientActions, type CabClientActions } from "./decorators/cab.js";
 import { ZERODEV_URLS } from "../config/constants.js";
+import type {
+  GetIntentParameters,
+  GetIntentReturnType,
+} from "../actions/getIntent.js";
+
+export type IntentRpcSchema = [
+  {
+    Method: "ui_getIntent";
+    Parameters: [GetIntentParameters];
+    ReturnType: GetIntentReturnType;
+  }
+];
+
+// Placeholder for future relay methods
+export type RelayerRpcSchema = [];
+
+// Combined schema for the CAB client
+export type CabRpcSchema = [...IntentRpcSchema, ...RelayerRpcSchema];
 
 export type CabClient<
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
   client extends Client | undefined = Client | undefined,
-  rpcSchema extends RpcSchema | undefined = undefined,
+  rpcSchema extends RpcSchema | undefined = undefined
 > = Prettify<
   Client<
     transport,
@@ -39,7 +59,9 @@ export type CabClient<
     rpcSchema extends RpcSchema
       ? [...rpcSchema, ...CabRpcSchema]
       : CabRpcSchema,
-    BundlerActions<account> & KernelAccountClientActions<chain, account> & CabClientActions
+    BundlerActions<account> &
+      KernelAccountClientActions<chain, account> &
+      CabClientActions<chain, account>
   >
 > & {
   client: client;
@@ -53,7 +75,7 @@ export type CreateCabClientConfig<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
   client extends Client | undefined = Client | undefined,
-  rpcSchema extends RpcSchema | undefined = undefined,
+  rpcSchema extends RpcSchema | undefined = undefined
 > = SmartAccountClientConfig<transport, chain, account, client, rpcSchema> & {
   bundlerTransport: transport;
   intentTransport?: transport;
@@ -61,18 +83,22 @@ export type CreateCabClientConfig<
 };
 
 export function createCabClient<
-  transport extends Transport,
-  chain extends Chain | undefined = undefined,
-  account extends SmartAccount | undefined = undefined,
-  client extends Client | undefined = undefined,
-  rpcSchema extends RpcSchema | undefined = undefined,
+    transport extends Transport,
+    chain extends Chain | undefined = undefined,
+    account extends SmartAccount | undefined = undefined,
+    client extends Client | undefined = undefined,
+    rpcSchema extends RpcSchema | undefined = undefined
 >(
-  parameters: CreateCabClientConfig<transport, chain, account, client, rpcSchema>,
-): CabClient<transport, chain, account, client, rpcSchema>;
+    parameters: CreateCabClientConfig<
+        transport,
+        chain,
+        account,
+        client,
+        rpcSchema
+    >
+): CabClient<transport, chain, account, client, rpcSchema>
 
-export function createCabClient(
-  parameters: CreateCabClientConfig,
-): CabClient {
+export function createCabClient(parameters: CreateCabClientConfig): CabClient {
   const {
     client: client_,
     key = "Account",
@@ -92,17 +118,17 @@ export function createCabClient(
       if (method.startsWith("eth_")) {
         return bundlerTransport({}).request({ method, params });
       }
-      
+
       // Route intent methods (ui_*)
       if (method.startsWith("ui_")) {
         return intentTransport({}).request({ method, params });
       }
-      
+
       // Route relay methods (rl_*)
       if (method.startsWith("rl_")) {
         return relayerTransport({}).request({ method, params });
       }
-      
+
       // Default to bundler transport for other methods
       return bundlerTransport({}).request({ method, params });
     },
@@ -117,7 +143,7 @@ export function createCabClient(
       name,
       type: "cabClient",
     }),
-    { client: client_, paymaster, paymasterContext, userOperation },
+    { client: client_, paymaster, paymasterContext, userOperation }
   );
 
   if (parameters.userOperation?.prepareUserOperation) {

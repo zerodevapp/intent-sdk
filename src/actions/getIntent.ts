@@ -1,31 +1,34 @@
-import type { RpcErrorType } from "viem";
-import type { CabClient } from "../client/cabClient.js";
+import type { Chain, Client, Hex, RpcErrorType, Transport } from "viem";
+import type { SmartAccount } from "viem/account-abstraction";
+import type { CabRpcSchema } from "../client/cabClient.js";
+import { deepHexlify } from "../utils/deepHexlify.js";
 
 export type GetIntentParameters = {
-  recipient: `0x${string}`;
-  callData: `0x${string}`;
+  recipient: Hex;
+  callData: Hex;
   inputTokens: Array<{
-    address: `0x${string}`;
+    address: Hex;
     amount: bigint;
-    chainId: bigint;
+    chainId: number;
   }>;
   outputTokens: Array<{
-    address: `0x${string}`;
+    address: Hex;
     amount: bigint;
-    chainId: bigint;
+    chainId: number;
   }>;
+  initData?: Hex | undefined;
 };
 
 // The actual order type
 export type GaslessCrossChainOrder = {
-  originSettler: `0x${string}`;
-  user: `0x${string}`;
+  originSettler: Hex;
+  user: Hex;
   nonce: bigint;
   originChainId: bigint;
   openDeadline: number;
   fillDeadline: number;
-  orderDataType: `0x${string}`;
-  orderData: `0x${string}`;
+  orderDataType: Hex;
+  orderData: Hex;
 };
 
 // Return type alias for the getIntent action
@@ -64,13 +67,17 @@ export type GetIntentErrorType = RpcErrorType;
  *   }]
  * })
  */
-export async function getIntent(
-  client: CabClient,
-  parameters: GetIntentParameters,
+export async function getIntent<
+  transport extends Transport = Transport,
+  chain extends Chain | undefined = Chain | undefined,
+  account extends SmartAccount | undefined = SmartAccount | undefined
+>(
+  client: Client<transport, chain, account, CabRpcSchema>,
+  parameters: GetIntentParameters
 ): Promise<GetIntentReturnType> {
   const intent = (await client.request({
     method: "ui_getIntent",
-    params: [parameters],
+    params: [deepHexlify(parameters)],
   })) as GetIntentReturnType;
 
   return intent;
