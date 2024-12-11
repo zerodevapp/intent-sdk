@@ -8,6 +8,16 @@ import {
   prepareUserIntent,
   type PrepareUserIntentResult,
 } from "../../actions/prepareUserIntent.js";
+import {
+  sendUserIntent,
+  type SendUserIntentParameters,
+  type SendUserIntentResult,
+} from "../../actions/sendUserIntent.js";
+import {
+  getUserIntentStatus,
+  type GetUserIntentStatusParameters,
+  type GetUserIntentStatusResult,
+} from "../../actions/getUserIntentStatus.js";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CabRpcSchema } from "../cabClient.js";
 
@@ -24,6 +34,13 @@ export type CabClientActions<
       typeof prepareUserIntent<account, chain, accountOverride, calls>
     >[1]
   ) => Promise<PrepareUserIntentResult>;
+  sendUserIntent: <
+    accountOverride extends SmartAccount | undefined = undefined,
+    calls extends readonly unknown[] = readonly unknown[]
+  >(
+    parameters: SendUserIntentParameters<account, accountOverride, calls>
+  ) => Promise<SendUserIntentResult>;
+  getUserIntentStatus: (parameters: GetUserIntentStatusParameters) => Promise<GetUserIntentStatusResult>;
 };
 
 export function cabClientActions(): <
@@ -36,5 +53,7 @@ export function cabClientActions(): <
   return (client) => ({
     getIntent: (parameters) => getIntent(client, parameters),
     prepareUserIntent: (parameters) => prepareUserIntent(client, parameters),
+    sendUserIntent: (parameters) => sendUserIntent(client, parameters),
+    getUserIntentStatus: (parameters) => getUserIntentStatus(client, parameters),
   });
 }

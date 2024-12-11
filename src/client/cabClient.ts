@@ -7,6 +7,7 @@ import {
   type Prettify,
   custom,
   http,
+  type Hex,
 } from "viem";
 import {
   type SmartAccount,
@@ -25,7 +26,10 @@ import { ZERODEV_URLS } from "../config/constants.js";
 import type {
   GetIntentParameters,
   GetIntentReturnType,
+  GaslessCrossChainOrder,
 } from "../actions/getIntent.js";
+import type { SendUserIntentResult } from "../actions/sendUserIntent.js";
+import type { GetUserIntentStatusResult } from "../actions/getUserIntentStatus.js";
 
 export type IntentRpcSchema = [
   {
@@ -35,8 +39,19 @@ export type IntentRpcSchema = [
   }
 ];
 
-// Placeholder for future relay methods
-export type RelayerRpcSchema = [];
+// Relayer methods
+export type RelayerRpcSchema = [
+  {
+    Method: "rl_sendUserIntent";
+    Parameters: [{ order: GaslessCrossChainOrder; signature: Hex; fillerData: Hex }];
+    ReturnType: SendUserIntentResult;
+  },
+  {
+    Method: "rl_getUserIntentStatus";
+    Parameters: [Hex];
+    ReturnType: GetUserIntentStatusResult;
+  }
+];
 
 // Combined schema for the CAB client
 export type CabRpcSchema = [...IntentRpcSchema, ...RelayerRpcSchema];
