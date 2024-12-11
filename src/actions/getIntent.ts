@@ -32,7 +32,10 @@ export type GaslessCrossChainOrder = {
 };
 
 // Return type alias for the getIntent action
-export type GetIntentReturnType = GaslessCrossChainOrder;
+export type GetIntentReturnType = {
+  order: GaslessCrossChainOrder;
+  fillerData: Hex;
+};
 
 export type GetIntentErrorType = RpcErrorType;
 
