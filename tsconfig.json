@@ -27,7 +27,8 @@
     "incremental": true,
     "composite": true,
     "rootDir": ".",
-    "types": ["bun-types"]
+    "types": ["bun-types", "viem"],
+    "noErrorTruncation": false
   },
   "include": ["src"],
   "exclude": ["node_modules", "_cjs", "_esm", "_types"]
