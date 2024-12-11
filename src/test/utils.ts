@@ -1,6 +1,6 @@
 import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator";
 import { createKernelAccount, KernelV3_1AccountAbi } from "@zerodev/sdk";
-import { getEntryPoint } from "@zerodev/sdk/constants";
+import { getEntryPoint, KERNEL_V3_2 } from "@zerodev/sdk/constants";
 import {
   type Chain,
   concatHex,
@@ -21,10 +21,11 @@ export const TEST_PRIVATE_KEY = process.env.PRIVATE_KEY as Hex;
 export const BUNDLER_RPC = "http://localhost:3000/rpc";
 export const INTENT_SERVICE_RPC = "http://localhost:3000/intent";
 export const RELAYER_SERVICE_RPC = "http://localhost:8080";
-export const kernelVersion = "0.3.1";
+export const kernelVersion = KERNEL_V3_2;
 const entryPoint = getEntryPoint("0.7");
 const intentExecutorAddress = "0xcEa9E1ED495f549E2ecEfc5f66b5e82c8F63af6D";
 export const index = 0n;
+export const timeout = 100000;
 
 export function getTestingChain(): Chain {
   return sepolia;

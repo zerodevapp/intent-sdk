@@ -1,11 +1,5 @@
-import { beforeAll, describe, expect, test } from "bun:test";
-import {
-  type Address,
-  encodeFunctionData,
-  parseUnits,
-  toHex,
-  zeroAddress,
-} from "viem";
+import { describe, expect, test } from "bun:test";
+import { parseUnits, zeroAddress } from "viem";
 import { baseSepolia, sepolia } from "viem/chains";
 import { getCabClient } from "./utils.js";
 
@@ -40,61 +34,8 @@ describe("prepareUserIntent", () => {
     console.log(intent);
 
     expect(intent).toBeDefined();
-    expect(intent.orderData).toBeDefined();
-    expect(intent.orderDataType).toBeDefined();
-    expect(BigInt(intent.originChainId)).toBe(BigInt(sepolia.id));
+    expect(intent.order.orderData).toBeDefined();
+    expect(intent.order.orderDataType).toBeDefined();
+    expect(BigInt(intent.order.originChainId)).toBe(BigInt(sepolia.id));
   });
-
-//   test.skip("should prepare intent with calls", async () => {
-//     const client = await getCabClient();
-//     const account = client.account;
-
-//     const to = "0x1234567890123456789012345678901234567890" as Address;
-//     const value = parseUnits("1", 18);
-//     const data = encodeFunctionData({
-//       abi: [
-//         {
-//           type: "function",
-//           name: "transfer",
-//           inputs: [
-//             { type: "address", name: "to" },
-//             { type: "uint256", name: "value" },
-//           ],
-//           outputs: [{ type: "bool" }],
-//         },
-//       ],
-//       functionName: "transfer",
-//       args: [to, value],
-//     });
-
-//     const intent = await client.prepareUserIntent({
-//       account,
-//       calls: [
-//         {
-//           to,
-//           value,
-//           data,
-//         },
-//       ],
-//       inputTokens: [
-//         {
-//           address: to,
-//           amount: value,
-//           chainId: BigInt(sepolia.id),
-//         },
-//       ],
-//       outputTokens: [
-//         {
-//           address: to,
-//           amount: value,
-//           chainId: BigInt(sepolia.id),
-//         },
-//       ],
-//     });
-
-//     expect(intent).toBeDefined();
-//     expect(intent.orderData).toBeDefined();
-//     expect(intent.orderDataType).toBeDefined();
-//     expect(intent.originChainId).toBe(BigInt(sepolia.id));
-//   });
 });
