@@ -25,7 +25,7 @@ export type PrepareUserIntentParameters<
 > = PrepareUserOperationParameters<account, accountOverride, calls> & {
   inputTokens: Array<{
     address: Hex;
-    amount: bigint;
+    amount?: bigint;
     chainId: number;
   }>;
   outputTokens: Array<{

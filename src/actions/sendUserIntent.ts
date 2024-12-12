@@ -138,7 +138,6 @@ export async function sendUserIntent<
       {
         order: intent.order,
         signature: signature_,
-        fillerData: intent.fillerData,
       },
     ],
   });

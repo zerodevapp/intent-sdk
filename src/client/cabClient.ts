@@ -43,7 +43,7 @@ export type IntentRpcSchema = [
 export type RelayerRpcSchema = [
   {
     Method: "rl_sendUserIntent";
-    Parameters: [{ order: GaslessCrossChainOrder; signature: Hex; fillerData: Hex }];
+    Parameters: [{ order: GaslessCrossChainOrder; signature: Hex; }];
     ReturnType: SendUserIntentResult;
   },
   {
@@ -67,6 +67,7 @@ export type CabClient<
     transport,
     chain extends Chain
       ? chain
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       : client extends Client<any, infer chain>
       ? chain
       : undefined,

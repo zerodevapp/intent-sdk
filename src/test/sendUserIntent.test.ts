@@ -25,7 +25,7 @@ describe("sendUserIntent", () => {
         {
           chainId: sepolia.id,
           address: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-          amount: parseUnits("1.3", 6),
+          // amount: parseUnits("1", 6),
         },
       ],
       outputTokens: [
