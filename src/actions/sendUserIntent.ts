@@ -114,7 +114,6 @@ export async function sendUserIntent<
 
   // Get the order hash
   const orderHash = getOrderHash(intent.order);
-  console.log(orderHash);
   const typeHash = getChainAgnosticTypeHash(orderHash, account.address);
 
   // Sign the order hash
@@ -122,9 +121,7 @@ export async function sendUserIntent<
   const signature = await account.kernelPluginManager.signMessage({
     message: { raw: typeHash },
   });
-  console.log(signature);
   let { signature: signature_ } = parseErc6492Signature(signature);
-  console.log(signature_);
   signature_ = concat([
     toHex(0, { size: 1 }),
     MAGIC_VALUE_SIG_REPLAYABLE,

@@ -1,4 +1,4 @@
 export const ZERODEV_URLS = {
-  INTENT_SERVICE: "http://127.0.0.1:3000/intent",
-  RELAYER_SERVICE: "http://127.0.0.1:8080",
+  INTENT_SERVICE: "https://user-intent-service.onrender.com/intent",
+  RELAYER_SERVICE: "https://relayer-d6ne.onrender.com",
 } as const; 
