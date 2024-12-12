@@ -31,7 +31,6 @@ const result1 = await client.sendUserIntent({
   }],
   inputTokens: [{
     address: '0x...',
-    amount: 1000000n,
     chainId: 1
   }],
   outputTokens: [{
@@ -51,7 +50,6 @@ const intent = await client.prepareUserIntent({
   }],
   inputTokens: [{
     address: '0x...',
-    amount: 1000000n,
     chainId: 1
   }],
   outputTokens: [{
