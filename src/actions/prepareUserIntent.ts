@@ -1,19 +1,19 @@
+import { AccountNotFoundError } from "@zerodev/sdk";
 import type {
+  Address,
   Chain,
   Client,
-  Transport,
-  Address,
   ContractFunctionParameters,
   Hex,
+  Transport,
 } from "viem";
+import { concatHex, encodeFunctionData } from "viem";
 import type {
+  PrepareUserOperationParameters,
   SmartAccount,
   UserOperationCall,
-  PrepareUserOperationParameters,
 } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
-import { AccountNotFoundError } from "@zerodev/sdk";
-import { concatHex, encodeFunctionData } from "viem";
 import type { CabRpcSchema } from "../client/cabClient.js";
 import type { GetIntentReturnType } from "./getIntent.js";
 import { getIntent } from "./getIntent.js";
@@ -21,7 +21,7 @@ import { getIntent } from "./getIntent.js";
 export type PrepareUserIntentParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
-  calls extends readonly unknown[] = readonly unknown[]
+  calls extends readonly unknown[] = readonly unknown[],
 > = PrepareUserOperationParameters<account, accountOverride, calls> & {
   inputTokens: Array<{
     address: Hex;
@@ -91,10 +91,10 @@ export async function prepareUserIntent<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   chain extends Chain | undefined = Chain | undefined,
   accountOverride extends SmartAccount | undefined = undefined,
-  calls extends readonly unknown[] = readonly unknown[]
+  calls extends readonly unknown[] = readonly unknown[],
 >(
   client: Client<Transport, chain, account, CabRpcSchema>,
-  parameters: PrepareUserIntentParameters<account, accountOverride, calls>
+  parameters: PrepareUserIntentParameters<account, accountOverride, calls>,
 ): Promise<PrepareUserIntentResult> {
   const { account: account_ = client.account } = parameters;
   if (!account_) throw new AccountNotFoundError();
@@ -119,7 +119,7 @@ export async function prepareUserIntent<
               value: call.value,
             } as UserOperationCall;
           return call as UserOperationCall;
-        })
+        }),
       );
     return parameters.callData ?? "0x";
   })();

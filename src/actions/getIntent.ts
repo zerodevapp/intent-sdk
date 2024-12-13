@@ -72,10 +72,10 @@ export type GetIntentErrorType = RpcErrorType;
 export async function getIntent<
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
-  account extends SmartAccount | undefined = SmartAccount | undefined
+  account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
   client: Client<transport, chain, account, CabRpcSchema>,
-  parameters: GetIntentParameters
+  parameters: GetIntentParameters,
 ): Promise<GetIntentReturnType> {
   const intent = (await client.request({
     method: "ui_getIntent",

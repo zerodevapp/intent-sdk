@@ -1,56 +1,56 @@
 import {
-  type Chain,
-  type Transport,
-  createClient,
-  type Client,
-  type RpcSchema,
-  type Prettify,
-  custom,
-  http,
-  type Hex,
-} from "viem";
-import {
-  type SmartAccount,
-  type BundlerActions,
-  type BundlerClientConfig,
-  bundlerActions,
-  type PrepareUserOperationParameters,
-} from "viem/account-abstraction";
-import {
-  type SmartAccountClientConfig,
   type KernelAccountClientActions,
+  type SmartAccountClientConfig,
   kernelAccountClientActions,
 } from "@zerodev/sdk";
-import { cabClientActions, type CabClientActions } from "./decorators/cab.js";
-import { ZERODEV_URLS } from "../config/constants.js";
+import {
+  http,
+  type Chain,
+  type Client,
+  type Hex,
+  type Prettify,
+  type RpcSchema,
+  type Transport,
+  createClient,
+  custom,
+} from "viem";
+import {
+  type BundlerActions,
+  type BundlerClientConfig,
+  type PrepareUserOperationParameters,
+  type SmartAccount,
+  bundlerActions,
+} from "viem/account-abstraction";
 import type {
+  GaslessCrossChainOrder,
   GetIntentParameters,
   GetIntentReturnType,
-  GaslessCrossChainOrder,
 } from "../actions/getIntent.js";
-import type { SendUserIntentResult } from "../actions/sendUserIntent.js";
 import type { GetUserIntentStatusResult } from "../actions/getUserIntentStatus.js";
+import type { SendUserIntentResult } from "../actions/sendUserIntent.js";
+import { ZERODEV_URLS } from "../config/constants.js";
+import { type CabClientActions, cabClientActions } from "./decorators/cab.js";
 
 export type IntentRpcSchema = [
   {
     Method: "ui_getIntent";
     Parameters: [GetIntentParameters];
     ReturnType: GetIntentReturnType;
-  }
+  },
 ];
 
 // Relayer methods
 export type RelayerRpcSchema = [
   {
     Method: "rl_sendUserIntent";
-    Parameters: [{ order: GaslessCrossChainOrder; signature: Hex; }];
+    Parameters: [{ order: GaslessCrossChainOrder; signature: Hex }];
     ReturnType: SendUserIntentResult;
   },
   {
     Method: "rl_getUserIntentStatus";
     Parameters: [Hex];
     ReturnType: GetUserIntentStatusResult;
-  }
+  },
 ];
 
 // Combined schema for the CAB client
@@ -61,16 +61,16 @@ export type CabClient<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
   client extends Client | undefined = Client | undefined,
-  rpcSchema extends RpcSchema | undefined = undefined
+  rpcSchema extends RpcSchema | undefined = undefined,
 > = Prettify<
   Client<
     transport,
     chain extends Chain
       ? chain
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      : client extends Client<any, infer chain>
-      ? chain
-      : undefined,
+      : // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        client extends Client<any, infer chain>
+        ? chain
+        : undefined,
     account,
     rpcSchema extends RpcSchema
       ? [...rpcSchema, ...CabRpcSchema]
@@ -91,7 +91,7 @@ export type CreateCabClientConfig<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
   client extends Client | undefined = Client | undefined,
-  rpcSchema extends RpcSchema | undefined = undefined
+  rpcSchema extends RpcSchema | undefined = undefined,
 > = SmartAccountClientConfig<transport, chain, account, client, rpcSchema> & {
   bundlerTransport: transport;
   intentTransport?: transport;
@@ -99,20 +99,20 @@ export type CreateCabClientConfig<
 };
 
 export function createCabClient<
-    transport extends Transport,
-    chain extends Chain | undefined = undefined,
-    account extends SmartAccount | undefined = undefined,
-    client extends Client | undefined = undefined,
-    rpcSchema extends RpcSchema | undefined = undefined
+  transport extends Transport,
+  chain extends Chain | undefined = undefined,
+  account extends SmartAccount | undefined = undefined,
+  client extends Client | undefined = undefined,
+  rpcSchema extends RpcSchema | undefined = undefined,
 >(
-    parameters: CreateCabClientConfig<
-        transport,
-        chain,
-        account,
-        client,
-        rpcSchema
-    >
-): CabClient<transport, chain, account, client, rpcSchema>
+  parameters: CreateCabClientConfig<
+    transport,
+    chain,
+    account,
+    client,
+    rpcSchema
+  >,
+): CabClient<transport, chain, account, client, rpcSchema>;
 
 export function createCabClient(parameters: CreateCabClientConfig): CabClient {
   const {
@@ -159,7 +159,7 @@ export function createCabClient(parameters: CreateCabClientConfig): CabClient {
       name,
       type: "cabClient",
     }),
-    { client: client_, paymaster, paymasterContext, userOperation }
+    { client: client_, paymaster, paymasterContext, userOperation },
   );
 
   if (parameters.userOperation?.prepareUserOperation) {

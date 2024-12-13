@@ -40,10 +40,10 @@ export type GetUserIntentStatusResult = {
 export async function getUserIntentStatus<
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
-  account extends SmartAccount | undefined = SmartAccount | undefined
+  account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
   client: Client<transport, chain, account, CabRpcSchema>,
-  parameters: GetUserIntentStatusParameters
+  parameters: GetUserIntentStatusParameters,
 ): Promise<GetUserIntentStatusResult> {
   const result = await client.request({
     method: "rl_getUserIntentStatus",
@@ -51,4 +51,4 @@ export async function getUserIntentStatus<
   });
 
   return result as GetUserIntentStatusResult;
-} 
+}
