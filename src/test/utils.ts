@@ -25,7 +25,7 @@ export const INTENT_SERVICE_RPC = "http://127.0.0.1:3000/intent";
 export const RELAYER_SERVICE_RPC = "http://127.0.0.1:8080";
 export const kernelVersion = KERNEL_V3_2;
 const entryPoint = getEntryPoint("0.7");
-const intentExecutorAddress = "0xcEa9E1ED495f549E2ecEfc5f66b5e82c8F63af6D";
+const intentExecutorAddress = "0x04Eb0aDE11ec34cd4F41f9Ed516ada5c2eBffad2" // "0xcEa9E1ED495f549E2ecEfc5f66b5e82c8F63af6D";
 export const index = 0n;
 export const timeout = 100000;
 
