@@ -9,6 +9,7 @@ import {
   concatHex,
   pad,
   concat,
+  hashMessage,
 } from "viem";
 import type { CabRpcSchema } from "../client/cabClient.js";
 import type { PrepareUserIntentParameters } from "./prepareUserIntent.js";
@@ -109,11 +110,11 @@ export async function sendUserIntent<
         account,
         accountOverride,
         calls
-      >
+      >,
     ));
 
   // Get the order hash
-  const orderHash = getOrderHash(intent.order);
+  const orderHash = hashMessage({ raw: getOrderHash(intent.order) });
   console.log(orderHash);
   const typeHash = getChainAgnosticTypeHash(orderHash, account.address);
 
