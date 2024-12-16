@@ -5,6 +5,8 @@ import {
   type GetIntentReturnType,
   getIntent,
 } from "../../actions/getIntent.js";
+import { getUserIntentExecutionReceipt } from "../../actions/getUserIntentExecutionReceipt.js";
+import { getUserIntentOpenReceipt } from "../../actions/getUserIntentOpenReceipt.js";
 import {
   type GetUserIntentStatusParameters,
   type GetUserIntentStatusResult,
@@ -19,6 +21,20 @@ import {
   type SendUserIntentResult,
   sendUserIntent,
 } from "../../actions/sendUserIntent.js";
+import type {
+  GetUserIntentReceiptParameters,
+  GetUserIntentReceiptResult,
+} from "../../actions/types.js";
+import {
+  type WaitForUserIntentExecutionReceiptParameters,
+  type WaitForUserIntentExecutionReceiptReturnType,
+  waitForUserIntentExecutionReceipt,
+} from "../../actions/waitForUserIntentExecutionReceipt.js";
+import {
+  type WaitForUserIntentOpenReceiptParameters,
+  type WaitForUserIntentOpenReceiptReturnType,
+  waitForUserIntentOpenReceipt,
+} from "../../actions/waitForUserIntentOpenReceipt.js";
 import type { CabRpcSchema } from "../cabClient.js";
 
 export type CabClientActions<
@@ -43,6 +59,18 @@ export type CabClientActions<
   getUserIntentStatus: (
     parameters: GetUserIntentStatusParameters,
   ) => Promise<GetUserIntentStatusResult>;
+  getUserIntentOpenReceipt: (
+    parameters: GetUserIntentReceiptParameters,
+  ) => Promise<GetUserIntentReceiptResult>;
+  getUserIntentExecutionReceipt: (
+    parameters: GetUserIntentReceiptParameters,
+  ) => Promise<GetUserIntentReceiptResult>;
+  waitForUserIntentExecutionReceipt: (
+    parameters: WaitForUserIntentExecutionReceiptParameters,
+  ) => Promise<WaitForUserIntentExecutionReceiptReturnType>;
+  waitForUserIntentOpenReceipt: (
+    parameters: WaitForUserIntentOpenReceiptParameters,
+  ) => Promise<WaitForUserIntentOpenReceiptReturnType>;
 };
 
 export function cabClientActions(): <
@@ -58,5 +86,13 @@ export function cabClientActions(): <
     sendUserIntent: (parameters) => sendUserIntent(client, parameters),
     getUserIntentStatus: (parameters) =>
       getUserIntentStatus(client, parameters),
+    getUserIntentOpenReceipt: (parameters) =>
+      getUserIntentOpenReceipt(client, parameters),
+    getUserIntentExecutionReceipt: (parameters) =>
+      getUserIntentExecutionReceipt(client, parameters),
+    waitForUserIntentExecutionReceipt: (parameters) =>
+      waitForUserIntentExecutionReceipt(client, parameters),
+    waitForUserIntentOpenReceipt: (parameters) =>
+      waitForUserIntentOpenReceipt(client, parameters),
   });
 }

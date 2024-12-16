@@ -28,6 +28,7 @@ import type {
 } from "../actions/getIntent.js";
 import type { GetUserIntentStatusResult } from "../actions/getUserIntentStatus.js";
 import type { SendUserIntentResult } from "../actions/sendUserIntent.js";
+import type { GetUserIntentReceiptResult } from "../actions/types.js";
 import { ZERODEV_URLS } from "../config/constants.js";
 import { type CabClientActions, cabClientActions } from "./decorators/cab.js";
 
@@ -50,6 +51,16 @@ export type RelayerRpcSchema = [
     Method: "rl_getUserIntentStatus";
     Parameters: [Hex];
     ReturnType: GetUserIntentStatusResult;
+  },
+  {
+    Method: "rl_getUserIntentOpenReceipt";
+    Parameters: [Hex];
+    ReturnType: GetUserIntentReceiptResult;
+  },
+  {
+    Method: "rl_getUserIntentExecutionReceipt";
+    Parameters: [Hex];
+    ReturnType: GetUserIntentReceiptResult;
   },
 ];
 
