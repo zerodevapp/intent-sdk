@@ -64,10 +64,15 @@ const result2 = await client.sendUserIntent({
   intent
 })
 
-// Check intent status (works for both flows)
-const status = await client.getUserIntentStatus({
-  uiHash: result1.uiHash // or result2.uiHash
-})
+// Wait for the intent to be opened (works for both flows)
+const openReceipt = await client.waitForUserIntentOpenReceipt({
+  uiHash: result1.uiHash, // or result2.uiHash
+});
+
+// Wait for the intent to be executed (works for both flows)
+const executionReceipt = await client.waitForUserIntentExecutionReceipt({
+  uiHash: result1.uiHash, // or result2.uiHash
+});
 ```
 
 ## Features
