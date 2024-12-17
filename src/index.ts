@@ -31,3 +31,5 @@ export type {
   WaitForUserIntentOpenReceiptParameters,
   WaitForUserIntentOpenReceiptReturnType,
 } from "./actions/waitForUserIntentOpenReceipt.js";
+
+export { INTENT_EXECUTOR } from "./config/constants.js";
