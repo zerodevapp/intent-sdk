@@ -40,7 +40,7 @@ export type IntentRpcSchema = [
     Method: "ui_getIntent";
     Parameters: [GetIntentParameters];
     ReturnType: GetIntentReturnType;
-  }
+  },
 ];
 
 // Relayer methods
@@ -64,7 +64,7 @@ export type RelayerRpcSchema = [
     Method: "rl_getUserIntentExecutionReceipt";
     Parameters: [Hex];
     ReturnType: GetUserIntentReceiptResult;
-  }
+  },
 ];
 
 // Combined schema for the Intent client
@@ -75,16 +75,16 @@ export type IntentClient<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
   client extends Client | undefined = Client | undefined,
-  rpcSchema extends RpcSchema | undefined = undefined
+  rpcSchema extends RpcSchema | undefined = undefined,
 > = Prettify<
   Client<
     transport,
     chain extends Chain
       ? chain
       : // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      client extends Client<any, infer chain>
-      ? chain
-      : undefined,
+        client extends Client<any, infer chain>
+        ? chain
+        : undefined,
     account,
     rpcSchema extends RpcSchema
       ? [...rpcSchema, ...CombinedIntentRpcSchema]
@@ -105,7 +105,7 @@ export type CreateIntentClientConfig<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
   client extends Client | undefined = Client | undefined,
-  rpcSchema extends RpcSchema | undefined = undefined
+  rpcSchema extends RpcSchema | undefined = undefined,
 > = SmartAccountClientConfig<transport, chain, account, client, rpcSchema> & {
   bundlerTransport: transport;
   intentTransport?: transport;
@@ -117,7 +117,7 @@ export function createIntentClient<
   chain extends Chain | undefined = undefined,
   account extends SmartAccount | undefined = undefined,
   client extends Client | undefined = undefined,
-  rpcSchema extends RpcSchema | undefined = undefined
+  rpcSchema extends RpcSchema | undefined = undefined,
 >(
   parameters: CreateIntentClientConfig<
     transport,
@@ -125,11 +125,11 @@ export function createIntentClient<
     account,
     client,
     rpcSchema
-  >
+  >,
 ): IntentClient<transport, chain, account, client, rpcSchema>;
 
 export function createIntentClient(
-  parameters: CreateIntentClientConfig
+  parameters: CreateIntentClientConfig,
 ): IntentClient {
   const {
     client: client_,
@@ -175,7 +175,7 @@ export function createIntentClient(
       name,
       type: "intentClient",
     }),
-    { client: client_, paymaster, paymasterContext, userOperation }
+    { client: client_, paymaster, paymasterContext, userOperation },
   );
 
   if (parameters.userOperation?.prepareUserOperation) {

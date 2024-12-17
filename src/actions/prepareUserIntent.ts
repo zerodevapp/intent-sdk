@@ -1,4 +1,7 @@
-import { AccountNotFoundError } from "@zerodev/sdk";
+import {
+  AccountNotFoundError,
+  type KernelSmartAccountImplementation,
+} from "@zerodev/sdk";
 import type {
   Address,
   Chain,
@@ -99,7 +102,9 @@ export async function prepareUserIntent<
   const { account: account_ = client.account } = parameters;
   if (!account_) throw new AccountNotFoundError();
 
-  const account = parseAccount(account_);
+  const account = parseAccount(
+    account_,
+  ) as SmartAccount<KernelSmartAccountImplementation>;
 
   // Convert the user intent parameters to getIntent parameters
   const { inputTokens, outputTokens } = parameters;
@@ -124,9 +129,9 @@ export async function prepareUserIntent<
     return parameters.callData ?? "0x";
   })();
 
-  const { factory, factoryData } = await account.getFactoryArgs();
-  const initData =
-    factory && factoryData ? concatHex([factory, factoryData]) : undefined;
+  const factoryAddress = account.factoryAddress;
+  const factoryData = await account.generateInitCode();
+  const initData = concatHex([factoryAddress, factoryData]);
 
   // Call getIntent with the converted parameters
   return getIntent(client, {

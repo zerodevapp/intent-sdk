@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { parseUnits, zeroAddress } from "viem";
+import { baseSepolia, sepolia } from "viem/chains";
 import { getIntentClient } from "./utils.js";
-import { sepolia, baseSepolia } from "viem/chains";
 
 describe("prepareUserIntent", () => {
   test("should prepare user intent", async () => {

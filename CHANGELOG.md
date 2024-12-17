@@ -1,5 +1,12 @@
 # @zerodev/intent
 
+
+## 0.0.2
+
+### Patch Changes
+
+- Updated prepareUserIntent to use factory address and factory data regardless of account deployment status
+
 ## 0.0.1
 
 ### Patch Changes
