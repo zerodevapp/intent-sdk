@@ -1,6 +1,6 @@
 import type { Chain, Client, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
-import type { CabRpcSchema } from "../client/cabClient.js";
+import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import type {
   GetUserIntentReceiptParameters,
   GetUserIntentReceiptResult,
@@ -18,7 +18,7 @@ export async function getUserIntentExecutionReceipt<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: Client<transport, chain, account, CabRpcSchema>,
+  client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetUserIntentReceiptParameters,
 ): Promise<GetUserIntentReceiptResult> {
   const result = await client.request({

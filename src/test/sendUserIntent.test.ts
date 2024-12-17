@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import { parseUnits, zeroAddress } from "viem";
 import { baseSepolia, sepolia } from "viem/chains";
-import { getCabClient, timeout } from "./utils.js";
+import { getIntentClient, timeout } from "./utils.js";
 
 describe("sendUserIntent", () => {
   test(
     "should send intent with prepared order",
     async () => {
-      const client = await getCabClient();
+      const client = await getIntentClient();
       console.log(client.account.address);
 
       console.time("sendUserIntent");
@@ -52,7 +52,7 @@ describe("sendUserIntent", () => {
   );
 
   test.skip("should send intent with existing order", async () => {
-    const client = await getCabClient();
+    const client = await getIntentClient();
 
     // First prepare an order
     const intent = await client.prepareUserIntent({

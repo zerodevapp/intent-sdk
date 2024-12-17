@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { parseUnits, zeroAddress } from "viem";
-import { baseSepolia, sepolia } from "viem/chains";
-import { getCabClient } from "./utils.js";
+import { getIntentClient } from "./utils.js";
+import { sepolia, baseSepolia } from "viem/chains";
 
 describe("prepareUserIntent", () => {
-  test("should prepare intent with callData", async () => {
-    const client = await getCabClient();
+  test("should prepare user intent", async () => {
+    const client = await getIntentClient();
     console.log({ accountAddress: client.account.address });
 
     const intent = await client.prepareUserIntent({

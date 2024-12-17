@@ -1,5 +1,5 @@
-export { createCabClient } from "./client/cabClient.js";
-export type { CabClient } from "./client/cabClient.js";
+export { createIntentClient } from "./client/intentClient.js";
+export type { IntentClient } from "./client/intentClient.js";
 export type {
   PrepareUserIntentParameters,
   PrepareUserIntentResult,

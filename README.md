@@ -1,20 +1,20 @@
-# @zerodev/cab-sdk
+# @zerodev/intent
 
 Chain Abstraction SDK for ZeroDev, built on top of @zerodev/sdk.
 
 ## Installation
 
 ```bash
-bun add @zerodev/cab-sdk
+bun add @zerodev/intent
 ```
 
 ## Usage
 
 ```typescript
-import { createCabClient } from '@zerodev/cab-sdk'
+import { createIntentClient } from '@zerodev/intent'
 import { mainnet } from 'viem/chains'
 
-const client = createCabClient({
+const client = createIntentClient({
   chain: mainnet,
   bundlerTransport: http(),
   // Optional transports

@@ -14,8 +14,8 @@ import {
 import type { SmartAccount } from "viem/account-abstraction";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
-import { createCabClient } from "../client/cabClient.js";
-import type { CabClient } from "../client/cabClient.js";
+import { createIntentClient } from "../client/intentClient.js";
+import type { IntentClient } from "../client/intentClient.js";
 
 export const TEST_PRIVATE_KEY = process.env.PRIVATE_KEY as Hex;
 export const BUNDLER_RPC = "https://rpc.zerodev.app/api/v2/bundler/";
@@ -40,8 +40,8 @@ export function getPublicClient() {
   });
 }
 
-export async function getCabClient(): Promise<
-  CabClient<Transport, Chain, SmartAccount>
+export async function getIntentClient(): Promise<
+  IntentClient<Transport, Chain, SmartAccount>
 > {
   const publicClient = getPublicClient();
   const signer = privateKeyToAccount(TEST_PRIVATE_KEY);
@@ -69,7 +69,7 @@ export async function getCabClient(): Promise<
     useReplayableSignature: true,
   });
 
-  const client = createCabClient({
+  const client = createIntentClient({
     account: kernelAccount,
     chain: getTestingChain(),
     bundlerTransport: http(BUNDLER_RPC, { timeout }),

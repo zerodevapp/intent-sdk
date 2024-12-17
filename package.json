@@ -1,5 +1,5 @@
 {
-  "name": "@zerodev/cab-sdk",
+  "name": "@zerodev/intent",
   "version": "0.0.1",
   "type": "module",
   "main": "./_cjs/index.js",
@@ -7,6 +7,14 @@
   "types": "./_types/index.d.ts",
   "typings": "./_types/index.d.ts",
   "sideEffects": false,
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zerodevapp/intent-sdk.git"
+  },
   "files": [
     "_esm",
     "_cjs",

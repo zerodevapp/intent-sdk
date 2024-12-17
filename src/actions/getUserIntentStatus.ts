@@ -1,6 +1,6 @@
 import type { Chain, Client, Hex, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
-import type { CabRpcSchema } from "../client/cabClient.js";
+import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 
 export type UserIntentStatus = "NOT_FOUND" | "PENDING" | "OPENED" | "EXECUTED";
 
@@ -27,10 +27,10 @@ export type GetUserIntentStatusResult = {
  * @returns The status of the user intent. {@link GetUserIntentStatusResult}
  *
  * @example
- * import { createCabClient, http } from '@zerodev/cab-sdk'
+ * import { createIntentClient, http } from '@zerodev/intent'
  * import { mainnet } from 'viem/chains'
  *
- * const client = createCabClient({
+ * const client = createIntentClient({
  *   chain: mainnet,
  *   transport: http(),
  * })
@@ -42,7 +42,7 @@ export async function getUserIntentStatus<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: Client<transport, chain, account, CabRpcSchema>,
+  client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetUserIntentStatusParameters,
 ): Promise<GetUserIntentStatusResult> {
   const result = await client.request({

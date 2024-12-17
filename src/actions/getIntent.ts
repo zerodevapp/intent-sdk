@@ -1,6 +1,6 @@
 import type { Chain, Client, Hex, RpcErrorType, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
-import type { CabRpcSchema } from "../client/cabClient.js";
+import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import { deepHexlify } from "../utils/deepHexlify.js";
 
 export type GetIntentParameters = {
@@ -46,10 +46,10 @@ export type GetIntentErrorType = RpcErrorType;
  * @returns The intent. {@link GetIntentReturnType}
  *
  * @example
- * import { createCabClient, http } from '@zerodev/cab-sdk'
+ * import { createIntentClient, http } from '@zerodev/intent'
  * import { mainnet } from 'viem/chains'
  *
- * const client = createCabClient({
+ * const client = createIntentClient({
  *   chain: mainnet,
  *   transport: http(),
  * })
@@ -74,7 +74,7 @@ export async function getIntent<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: Client<transport, chain, account, CabRpcSchema>,
+  client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetIntentParameters,
 ): Promise<GetIntentReturnType> {
   const intent = (await client.request({

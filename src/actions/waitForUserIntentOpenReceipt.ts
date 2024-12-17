@@ -1,7 +1,7 @@
 import type { Chain, Client, Hex, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import { stringify } from "viem/utils";
-import type { CabRpcSchema } from "../client/cabClient.js";
+import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import { observe } from "../utils/observe.js";
 import { poll } from "../utils/poll.js";
 import { getUserIntentOpenReceipt } from "./getUserIntentOpenReceipt.js";
@@ -48,10 +48,10 @@ export type WaitForUserIntentOpenReceiptReturnType = IntentReceipt;
  * @returns The open receipt of the user intent. {@link WaitForUserIntentOpenReceiptReturnType}
  *
  * @example
- * import { createCabClient, http } from '@zerodev/cab-sdk'
+ * import { createIntentClient, http } from '@zerodev/intent'
  * import { mainnet } from 'viem/chains'
  *
- * const client = createCabClient({
+ * const client = createIntentClient({
  *   chain: mainnet,
  *   transport: http(),
  * })
@@ -65,7 +65,7 @@ export function waitForUserIntentOpenReceipt<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: Client<transport, chain, account, CabRpcSchema>,
+  client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: WaitForUserIntentOpenReceiptParameters,
 ): Promise<WaitForUserIntentOpenReceiptReturnType> {
   const {

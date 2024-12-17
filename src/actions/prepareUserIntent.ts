@@ -14,7 +14,7 @@ import type {
   UserOperationCall,
 } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
-import type { CabRpcSchema } from "../client/cabClient.js";
+import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import type { GetIntentReturnType } from "./getIntent.js";
 import { getIntent } from "./getIntent.js";
 
@@ -45,10 +45,10 @@ export type PrepareUserIntentResult = GetIntentReturnType;
  * @returns The prepared intent. {@link PrepareUserIntentResult}
  *
  * @example
- * import { createCabClient, http } from '@zerodev/cab-sdk'
+ * import { createIntentClient, http } from '@zerodev/intent'
  * import { mainnet } from 'viem/chains'
  *
- * const client = createCabClient({
+ * const client = createIntentClient({
  *   chain: mainnet,
  *   transport: http(),
  * })
@@ -93,7 +93,7 @@ export async function prepareUserIntent<
   accountOverride extends SmartAccount | undefined = undefined,
   calls extends readonly unknown[] = readonly unknown[],
 >(
-  client: Client<Transport, chain, account, CabRpcSchema>,
+  client: Client<Transport, chain, account, CombinedIntentRpcSchema>,
   parameters: PrepareUserIntentParameters<account, accountOverride, calls>,
 ): Promise<PrepareUserIntentResult> {
   const { account: account_ = client.account } = parameters;

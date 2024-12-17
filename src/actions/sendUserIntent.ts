@@ -11,7 +11,7 @@ import {
 } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
-import type { CabRpcSchema } from "../client/cabClient.js";
+import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import type {
   GaslessCrossChainOrder,
   GetIntentReturnType,
@@ -53,7 +53,7 @@ export async function sendUserIntent<
   accountOverride extends SmartAccount | undefined = undefined,
   calls extends readonly unknown[] = readonly unknown[],
 >(
-  client: Client<transport, chain, account, CabRpcSchema>,
+  client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: SendUserIntentParameters<account, accountOverride, calls>,
 ): Promise<SendUserIntentResult> {
   const {

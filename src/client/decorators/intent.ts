@@ -35,9 +35,9 @@ import {
   type WaitForUserIntentOpenReceiptReturnType,
   waitForUserIntentOpenReceipt,
 } from "../../actions/waitForUserIntentOpenReceipt.js";
-import type { CabRpcSchema } from "../cabClient.js";
+import type { CombinedIntentRpcSchema } from "../intentClient.js";
 
-export type CabClientActions<
+export type IntentClientActions<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 > = {
@@ -73,13 +73,13 @@ export type CabClientActions<
   ) => Promise<WaitForUserIntentOpenReceiptReturnType>;
 };
 
-export function cabClientActions(): <
+export function intentClientActions(): <
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: Client<transport, chain, account, CabRpcSchema>,
-) => CabClientActions<chain, account> {
+  client: Client<transport, chain, account, CombinedIntentRpcSchema>,
+) => IntentClientActions<chain, account> {
   return (client) => ({
     getIntent: (parameters) => getIntent(client, parameters),
     prepareUserIntent: (parameters) => prepareUserIntent(client, parameters),
