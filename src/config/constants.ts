@@ -7,4 +7,4 @@ export const ZERODEV_URLS = {
 } as const;
 
 export const INTENT_EXECUTOR: Address =
-  "0x04Eb0aDE11ec34cd4F41f9Ed516ada5c2eBffad2";
+  "0x3E1bF561DEbE46C22cc1e85EC8283A5EB49f5dae";
