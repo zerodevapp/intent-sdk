@@ -70,7 +70,7 @@ export function waitForUserIntentExecutionReceipt<
 ): Promise<WaitForUserIntentExecutionReceiptReturnType> {
   const {
     uiHash,
-    pollingInterval = client.pollingInterval,
+    pollingInterval = Math.min(client.pollingInterval, 1000),
     retryCount,
     timeout = 120_000,
   } = parameters;

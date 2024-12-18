@@ -10,6 +10,8 @@ import {
   createPublicClient,
   encodeFunctionData,
   zeroAddress,
+  encodeAbiParameters,
+  parseAbiParameters,
 } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import { privateKeyToAccount } from "viem/accounts";
@@ -20,7 +22,7 @@ import type { IntentClient } from "../client/intentClient.js";
 export const TEST_PRIVATE_KEY = process.env.PRIVATE_KEY as Hex;
 export const BUNDLER_RPC = "https://rpc.zerodev.app/api/v2/bundler/";
 export const PAYMASTER_RPC =
-  "https://rpc.zerodev.app/api/v2/paymaster/efbc1add-1c14-476e-b3f1-206db80e673c";
+  "https://rpc.zerodev.app/api/v2/paymaster/";
 export const INTENT_SERVICE_RPC = "http://127.0.0.1:3000/intent";
 export const RELAYER_SERVICE_RPC = "http://127.0.0.1:8080";
 export const kernelVersion = KERNEL_V3_2;
@@ -55,7 +57,7 @@ export async function getIntentClient(): Promise<
   const installModuleData = encodeFunctionData({
     abi: KernelV3_1AccountAbi,
     functionName: "installModule",
-    args: [BigInt(2), intentExecutorAddress, concatHex([zeroAddress, "0x"])],
+    args: [BigInt(2), intentExecutorAddress, concatHex([zeroAddress, encodeAbiParameters(parseAbiParameters(["bytes", "bytes"]), ["0x", "0x"])])],
   });
 
   const kernelAccount = await createKernelAccount(publicClient, {

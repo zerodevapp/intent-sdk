@@ -29,7 +29,7 @@ describe("sendUserIntent", () => {
           {
             chainId: baseSepolia.id,
             address: "0x4200000000000000000000000000000000000006",
-            amount: parseUnits("0.0005", 18),
+            amount: parseUnits("0.00005", 18),
           },
         ],
       });
