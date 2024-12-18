@@ -1,5 +1,10 @@
 # @zerodev/intent
 
+## 0.0.4
+
+### Patch Changes
+
+- chore: update address
 
 ## 0.0.2
 
