@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.5
+
+### Patch Changes
+
+- feat: export installIntentExecutor util
+
 ## 0.0.4
 
 ### Patch Changes

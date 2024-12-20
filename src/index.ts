@@ -33,3 +33,4 @@ export type {
 } from "./actions/waitForUserIntentOpenReceipt.js";
 
 export { INTENT_EXECUTOR } from "./config/constants.js";
+export { installIntentExecutor } from "./utils/installIntentExecutor.js";
