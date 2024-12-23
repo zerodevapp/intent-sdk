@@ -76,8 +76,7 @@ export async function getIntentClient(chain?: Chain): Promise<
     kernelVersion,
     entryPoint,
     index,
-    initConfig: [installModuleData],
-    useReplayableSignature: true,
+    initConfig: [installModuleData]
   });
 
   const client = createIntentClient({

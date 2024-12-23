@@ -86,6 +86,7 @@ export async function sendUserIntent<
   if (!client.account) throw new Error("Account not found");
   const signature = await account.signMessage({
     message: { raw: orderHash },
+    useReplayableSignature: true,
   });
   const { signature: signature_ } = parseErc6492Signature(signature);
 
