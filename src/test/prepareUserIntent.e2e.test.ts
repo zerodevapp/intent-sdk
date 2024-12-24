@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { zeroAddress } from "viem";
+import { MAINNET_TOKEN_ROUTES, TESTNET_TOKEN_ROUTES } from "./tokenRoutes.js";
 import { getIntentClient } from "./utils.js";
-import { TESTNET_TOKEN_ROUTES, MAINNET_TOKEN_ROUTES } from "./tokenRoutes.js";
 
 describe.skip("prepareUserIntent with TESTNET_TOKEN_ROUTES", () => {
   for (const routesWithChain of TESTNET_TOKEN_ROUTES) {
@@ -23,9 +23,12 @@ describe.skip("prepareUserIntent with TESTNET_TOKEN_ROUTES", () => {
         expect(intent).toBeDefined();
         expect(intent.order.orderData).toBeDefined();
         expect(intent.order.orderDataType).toBeDefined();
-        expect(BigInt(intent.order.originChainId)).toBe(BigInt(routesWithChain.chain.id));
-    }, 60000);
-  }}
+        expect(BigInt(intent.order.originChainId)).toBe(
+          BigInt(routesWithChain.chain.id),
+        );
+      }, 60000);
+    }
+  }
 });
 
 describe.skip("prepareUserIntent with MAINNET_TOKEN_ROUTES", () => {
@@ -48,7 +51,10 @@ describe.skip("prepareUserIntent with MAINNET_TOKEN_ROUTES", () => {
         expect(intent).toBeDefined();
         expect(intent.order.orderData).toBeDefined();
         expect(intent.order.orderDataType).toBeDefined();
-        expect(BigInt(intent.order.originChainId)).toBe(BigInt(routesWithChain.chain.id));
-    }, 60000);
-  }}
+        expect(BigInt(intent.order.originChainId)).toBe(
+          BigInt(routesWithChain.chain.id),
+        );
+      }, 60000);
+    }
+  }
 });

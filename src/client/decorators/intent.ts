@@ -1,6 +1,10 @@
 import type { Chain, Client, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import {
+  type EnableIntentResult,
+  enableIntent,
+} from "../../actions/enableIntent.js";
+import {
   type GetIntentParameters,
   type GetIntentReturnType,
   getIntent,
@@ -71,6 +75,7 @@ export type IntentClientActions<
   waitForUserIntentOpenReceipt: (
     parameters: WaitForUserIntentOpenReceiptParameters,
   ) => Promise<WaitForUserIntentOpenReceiptReturnType>;
+  enableIntent: () => Promise<EnableIntentResult>;
 };
 
 export function intentClientActions(): <
@@ -94,5 +99,6 @@ export function intentClientActions(): <
       waitForUserIntentExecutionReceipt(client, parameters),
     waitForUserIntentOpenReceipt: (parameters) =>
       waitForUserIntentOpenReceipt(client, parameters),
+    enableIntent: () => enableIntent(client),
   });
 }

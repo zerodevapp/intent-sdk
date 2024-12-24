@@ -31,6 +31,10 @@ export type {
   WaitForUserIntentOpenReceiptParameters,
   WaitForUserIntentOpenReceiptReturnType,
 } from "./actions/waitForUserIntentOpenReceipt.js";
+export type { EnableIntentResult } from "./actions/enableIntent.js";
 
 export { INTENT_EXECUTOR } from "./config/constants.js";
-export { installIntentExecutor } from "./utils/installIntentExecutor.js";
+export {
+  installIntentExecutor,
+  getInstallIntentExecutorCall,
+} from "./utils/installIntentExecutor.js";

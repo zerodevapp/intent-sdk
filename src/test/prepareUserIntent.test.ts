@@ -7,6 +7,7 @@ describe("prepareUserIntent", () => {
   test("should prepare user intent", async () => {
     const client = await getIntentClient();
     console.log({ accountAddress: client.account.address });
+    await client.enableIntent();
 
     const intent = await client.prepareUserIntent({
       calls: [

@@ -8,10 +8,10 @@ import {
   type Transport,
   concatHex,
   createPublicClient,
-  encodeFunctionData,
-  zeroAddress,
   encodeAbiParameters,
+  encodeFunctionData,
   parseAbiParameters,
+  zeroAddress,
 } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import { privateKeyToAccount } from "viem/accounts";
@@ -20,8 +20,9 @@ import { createIntentClient } from "../client/intentClient.js";
 import type { IntentClient } from "../client/intentClient.js";
 
 export const TEST_PRIVATE_KEY = process.env.PRIVATE_KEY as Hex;
-export const BUNDLER_RPC = "https://rpc.zerodev.app/api/v2/bundler/";
-export const PAYMASTER_RPC = "https://rpc.zerodev.app/api/v2/paymaster/";
+export const SEPOLIA_PROJECT_ID = process.env.SEPOLIA_PROJECT_ID;
+export const BUNDLER_RPC = `https://rpc.zerodev.app/api/v2/bundler/${SEPOLIA_PROJECT_ID}`;
+export const PAYMASTER_RPC = `https://rpc.zerodev.app/api/v2/paymaster/${SEPOLIA_PROJECT_ID}`;
 export const INTENT_SERVICE_RPC = "http://127.0.0.1:3000/intent";
 export const RELAYER_SERVICE_RPC = "http://127.0.0.1:8080";
 export const kernelVersion = KERNEL_V3_2;
@@ -41,9 +42,9 @@ export function getPublicClient(chain?: Chain) {
   });
 }
 
-export async function getIntentClient(chain?: Chain): Promise<
-  IntentClient<Transport, Chain, SmartAccount>
-> {
+export async function getIntentClient(
+  chain?: Chain,
+): Promise<IntentClient<Transport, Chain, SmartAccount>> {
   const publicClient = getPublicClient(chain);
   const signer = privateKeyToAccount(TEST_PRIVATE_KEY);
 
@@ -76,13 +77,14 @@ export async function getIntentClient(chain?: Chain): Promise<
     kernelVersion,
     entryPoint,
     index,
-    initConfig: [installModuleData]
+    initConfig: [installModuleData],
   });
 
   const client = createIntentClient({
     account: kernelAccount,
     chain: getTestingChain(),
     bundlerTransport: http(BUNDLER_RPC, { timeout }),
+    client: publicClient,
     // intentTransport: http(INTENT_SERVICE_RPC),
     // relayerTransport: http(RELAYER_SERVICE_RPC),
   });

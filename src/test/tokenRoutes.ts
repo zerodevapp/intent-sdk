@@ -24,10 +24,10 @@ export type OutputToken = {
 export type TokenRoute = {
   chain: Chain;
   routes: {
-    name: string,
-    inputTokens: InputToken[],
-    outputTokens: OutputToken[],
-  }[]
+    name: string;
+    inputTokens: InputToken[];
+    outputTokens: OutputToken[];
+  }[];
 };
 
 export const SEPOLIA_TOKEN_ROUTES: TokenRoute = {
@@ -35,7 +35,7 @@ export const SEPOLIA_TOKEN_ROUTES: TokenRoute = {
   routes: [
     // NATIVE
     {
-      name: 'sepolia eth <-> baseSepolia eth',
+      name: "sepolia eth <-> baseSepolia eth",
       inputTokens: [
         {
           chainId: sepolia.id,
@@ -52,7 +52,7 @@ export const SEPOLIA_TOKEN_ROUTES: TokenRoute = {
     },
     // USDC
     {
-      name: 'sepolia usdc <-> baseSepolia usdc',
+      name: "sepolia usdc <-> baseSepolia usdc",
       inputTokens: [
         {
           chainId: sepolia.id,
@@ -75,7 +75,7 @@ export const BASE_SEPOLIA_TOKEN_ROUTES: TokenRoute = {
   routes: [
     // NATIVE
     {
-      name: 'baseSepolia eth <-> sepolia eth',
+      name: "baseSepolia eth <-> sepolia eth",
       inputTokens: [
         {
           chainId: baseSepolia.id,
@@ -92,7 +92,7 @@ export const BASE_SEPOLIA_TOKEN_ROUTES: TokenRoute = {
     },
     // USDC
     {
-      name: 'baseSepolia usdc <-> sepolia usdc',
+      name: "baseSepolia usdc <-> sepolia usdc",
       inputTokens: [
         {
           chainId: baseSepolia.id,
@@ -115,7 +115,7 @@ export const ETH_TOKEN_ROUTES: TokenRoute = {
   routes: [
     // NATIVE
     {
-      name: 'mainnet eth <-> op eth',
+      name: "mainnet eth <-> op eth",
       inputTokens: [
         {
           chainId: mainnet.id,
@@ -131,7 +131,7 @@ export const ETH_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'mainnet eth <-> arb eth',
+      name: "mainnet eth <-> arb eth",
       inputTokens: [
         {
           chainId: mainnet.id,
@@ -147,7 +147,7 @@ export const ETH_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'mainnet eth <-> base eth',
+      name: "mainnet eth <-> base eth",
       inputTokens: [
         {
           chainId: mainnet.id,
@@ -164,7 +164,7 @@ export const ETH_TOKEN_ROUTES: TokenRoute = {
     },
     // USDC
     {
-      name: 'mainnet usdc <-> op usdc',
+      name: "mainnet usdc <-> op usdc",
       inputTokens: [
         {
           chainId: mainnet.id,
@@ -180,7 +180,7 @@ export const ETH_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'mainnet usdc <-> arb usdc',
+      name: "mainnet usdc <-> arb usdc",
       inputTokens: [
         {
           chainId: mainnet.id,
@@ -196,7 +196,7 @@ export const ETH_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'mainnet usdc <-> base usdc',
+      name: "mainnet usdc <-> base usdc",
       inputTokens: [
         {
           chainId: mainnet.id,
@@ -212,7 +212,7 @@ export const ETH_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'mainnet usdc <-> bsc usdc',
+      name: "mainnet usdc <-> bsc usdc",
       inputTokens: [
         {
           chainId: mainnet.id,
@@ -229,7 +229,7 @@ export const ETH_TOKEN_ROUTES: TokenRoute = {
     },
     // USDT
     {
-      name: 'mainnet usdt <-> op usdt',
+      name: "mainnet usdt <-> op usdt",
       inputTokens: [
         {
           chainId: mainnet.id,
@@ -245,7 +245,7 @@ export const ETH_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'mainnet usdt <-> arb usdt',
+      name: "mainnet usdt <-> arb usdt",
       inputTokens: [
         {
           chainId: mainnet.id,
@@ -261,7 +261,7 @@ export const ETH_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'mainnet usdt <-> bsc usdt',
+      name: "mainnet usdt <-> bsc usdt",
       inputTokens: [
         {
           chainId: mainnet.id,
@@ -284,7 +284,7 @@ export const OP_TOKEN_ROUTES: TokenRoute = {
   routes: [
     // NATIVE
     {
-      name: 'op eth <-> mainnet eth',
+      name: "op eth <-> mainnet eth",
       inputTokens: [
         {
           chainId: optimism.id,
@@ -300,7 +300,7 @@ export const OP_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'op eth <-> arb eth',
+      name: "op eth <-> arb eth",
       inputTokens: [
         {
           chainId: optimism.id,
@@ -316,7 +316,7 @@ export const OP_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'op eth <-> base eth',
+      name: "op eth <-> base eth",
       inputTokens: [
         {
           chainId: optimism.id,
@@ -333,7 +333,7 @@ export const OP_TOKEN_ROUTES: TokenRoute = {
     },
     // USDC
     {
-      name: 'op usdc <-> mainnet usdc',
+      name: "op usdc <-> mainnet usdc",
       inputTokens: [
         {
           chainId: optimism.id,
@@ -349,7 +349,7 @@ export const OP_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'op usdc <-> arb usdc',
+      name: "op usdc <-> arb usdc",
       inputTokens: [
         {
           chainId: optimism.id,
@@ -365,7 +365,7 @@ export const OP_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'op usdc <-> base usdc',
+      name: "op usdc <-> base usdc",
       inputTokens: [
         {
           chainId: optimism.id,
@@ -381,7 +381,7 @@ export const OP_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'op usdt <-> bsc usdc',
+      name: "op usdt <-> bsc usdc",
       inputTokens: [
         {
           chainId: optimism.id,
@@ -398,7 +398,7 @@ export const OP_TOKEN_ROUTES: TokenRoute = {
     },
     // USDT
     {
-      name: 'op usdt <-> mainnet usdt',
+      name: "op usdt <-> mainnet usdt",
       inputTokens: [
         {
           chainId: optimism.id,
@@ -414,7 +414,7 @@ export const OP_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'op usdt <-> arb usdt',
+      name: "op usdt <-> arb usdt",
       inputTokens: [
         {
           chainId: optimism.id,
@@ -430,7 +430,7 @@ export const OP_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'op usdt <-> bsc usdt',
+      name: "op usdt <-> bsc usdt",
       inputTokens: [
         {
           chainId: optimism.id,
@@ -453,7 +453,7 @@ export const ARB_TOKEN_ROUTES: TokenRoute = {
   routes: [
     // NATIVE
     {
-      name: 'arb eth <-> mainnet eth',
+      name: "arb eth <-> mainnet eth",
       inputTokens: [
         {
           chainId: arbitrum.id,
@@ -469,7 +469,7 @@ export const ARB_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'arb eth <-> op eth',
+      name: "arb eth <-> op eth",
       inputTokens: [
         {
           chainId: arbitrum.id,
@@ -485,7 +485,7 @@ export const ARB_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'arb eth <-> base eth',
+      name: "arb eth <-> base eth",
       inputTokens: [
         {
           chainId: arbitrum.id,
@@ -502,7 +502,7 @@ export const ARB_TOKEN_ROUTES: TokenRoute = {
     },
     // USDC
     {
-      name: 'arb usdc <-> mainnet usdc',
+      name: "arb usdc <-> mainnet usdc",
       inputTokens: [
         {
           chainId: arbitrum.id,
@@ -518,7 +518,7 @@ export const ARB_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'arb usdc <-> op usdc',
+      name: "arb usdc <-> op usdc",
       inputTokens: [
         {
           chainId: arbitrum.id,
@@ -534,7 +534,7 @@ export const ARB_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'arb usdc <-> base usdc',
+      name: "arb usdc <-> base usdc",
       inputTokens: [
         {
           chainId: arbitrum.id,
@@ -550,7 +550,7 @@ export const ARB_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'arb usdc <-> bsc usdc',
+      name: "arb usdc <-> bsc usdc",
       inputTokens: [
         {
           chainId: arbitrum.id,
@@ -567,7 +567,7 @@ export const ARB_TOKEN_ROUTES: TokenRoute = {
     },
     // USDT
     {
-      name: 'arb usdt <-> mainnet usdt',
+      name: "arb usdt <-> mainnet usdt",
       inputTokens: [
         {
           chainId: arbitrum.id,
@@ -583,7 +583,7 @@ export const ARB_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'arb usdt <-> op usdt',
+      name: "arb usdt <-> op usdt",
       inputTokens: [
         {
           chainId: arbitrum.id,
@@ -599,7 +599,7 @@ export const ARB_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'arb usdt <-> bsc usdt',
+      name: "arb usdt <-> bsc usdt",
       inputTokens: [
         {
           chainId: arbitrum.id,
@@ -622,7 +622,7 @@ export const BASE_TOKEN_ROUTES: TokenRoute = {
   routes: [
     // NATIVE
     {
-      name: 'base eth <-> mainnet eth',
+      name: "base eth <-> mainnet eth",
       inputTokens: [
         {
           chainId: base.id,
@@ -638,7 +638,7 @@ export const BASE_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'base eth <-> op eth',
+      name: "base eth <-> op eth",
       inputTokens: [
         {
           chainId: base.id,
@@ -654,7 +654,7 @@ export const BASE_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'base eth <-> arb eth',
+      name: "base eth <-> arb eth",
       inputTokens: [
         {
           chainId: base.id,
@@ -671,7 +671,7 @@ export const BASE_TOKEN_ROUTES: TokenRoute = {
     },
     // USDC
     {
-      name: 'base usdc <-> mainnet usdc',
+      name: "base usdc <-> mainnet usdc",
       inputTokens: [
         {
           chainId: base.id,
@@ -687,7 +687,7 @@ export const BASE_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'base usdc <-> op usdc',
+      name: "base usdc <-> op usdc",
       inputTokens: [
         {
           chainId: base.id,
@@ -703,7 +703,7 @@ export const BASE_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'base usdc <-> arb usdc',
+      name: "base usdc <-> arb usdc",
       inputTokens: [
         {
           chainId: base.id,
@@ -719,7 +719,7 @@ export const BASE_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'base usdc <-> bsc usdc',
+      name: "base usdc <-> bsc usdc",
       inputTokens: [
         {
           chainId: base.id,
@@ -742,7 +742,7 @@ export const BSC_TOKEN_ROUTES: TokenRoute = {
   routes: [
     // USDC
     {
-      name: 'bsc usdc <-> mainnet usdc',
+      name: "bsc usdc <-> mainnet usdc",
       inputTokens: [
         {
           chainId: bsc.id,
@@ -758,7 +758,7 @@ export const BSC_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'bsc usdc <-> op usdc',
+      name: "bsc usdc <-> op usdc",
       inputTokens: [
         {
           chainId: bsc.id,
@@ -774,7 +774,7 @@ export const BSC_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'bsc usdc <-> arb usdc',
+      name: "bsc usdc <-> arb usdc",
       inputTokens: [
         {
           chainId: bsc.id,
@@ -790,7 +790,7 @@ export const BSC_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'bsc usdc <-> base usdc',
+      name: "bsc usdc <-> base usdc",
       inputTokens: [
         {
           chainId: bsc.id,
@@ -807,7 +807,7 @@ export const BSC_TOKEN_ROUTES: TokenRoute = {
     },
     // USDT
     {
-      name: 'bsc usdt <-> mainnet usdt',
+      name: "bsc usdt <-> mainnet usdt",
       inputTokens: [
         {
           chainId: bsc.id,
@@ -823,7 +823,7 @@ export const BSC_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'bsc usdt <-> op usdt',
+      name: "bsc usdt <-> op usdt",
       inputTokens: [
         {
           chainId: bsc.id,
@@ -839,7 +839,7 @@ export const BSC_TOKEN_ROUTES: TokenRoute = {
       ],
     },
     {
-      name: 'bsc usdt <-> arb usdt',
+      name: "bsc usdt <-> arb usdt",
       inputTokens: [
         {
           chainId: bsc.id,
