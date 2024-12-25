@@ -26,16 +26,22 @@ export type PrepareUserIntentParameters<
   accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
   calls extends readonly unknown[] = readonly unknown[],
 > = PrepareUserOperationParameters<account, accountOverride, calls> & {
-  inputTokens: Array<{
+  inputTokens?: Array<{
     address: Hex;
     amount?: bigint;
     chainId: number;
   }>;
-  outputTokens: Array<{
+  outputTokens?: Array<{
     address: Hex;
     amount: bigint;
     chainId: number;
   }>;
+  gasTokens?: Array<{
+    address: Hex;
+    amount?: bigint;
+    chainId: number;
+  }>;
+  chainId?: number;
 };
 
 export type PrepareUserIntentResult = GetIntentReturnType;
@@ -107,7 +113,7 @@ export async function prepareUserIntent<
   ) as SmartAccount<KernelSmartAccountImplementation>;
 
   // Convert the user intent parameters to getIntent parameters
-  const { inputTokens, outputTokens } = parameters;
+  const { inputTokens, outputTokens, chainId, gasTokens } = parameters;
 
   // Get callData from either direct callData or encoded calls
   const callData = await (async () => {
@@ -137,8 +143,10 @@ export async function prepareUserIntent<
   return getIntent(client, {
     recipient: account.address,
     callData,
-    inputTokens,
-    outputTokens,
+    inputTokens: inputTokens ?? [],
+    outputTokens: outputTokens ?? [],
+    gasTokens: gasTokens ?? [],
+    chainId,
     initData,
   });
 }

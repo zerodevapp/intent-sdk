@@ -17,6 +17,13 @@ export type GetIntentParameters = {
     chainId: number;
   }>;
   initData?: Hex | undefined;
+  // same-chain
+  gasTokens: Array<{
+    address: Hex;
+    amount?: bigint;
+    chainId: number;
+  }>;
+  chainId?: number;
 };
 
 // The actual order type
