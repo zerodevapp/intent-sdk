@@ -1,6 +1,8 @@
 import type { Chain, Client, Hex, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
+import { IntentVersionToAddressesMap } from "../config/constants.js";
+import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 
 export type UserIntentStatus = "NOT_FOUND" | "PENDING" | "OPENED" | "EXECUTED";
 
@@ -44,10 +46,14 @@ export async function getUserIntentStatus<
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetUserIntentStatusParameters,
+  version: INTENT_VERSION_TYPE,
 ): Promise<GetUserIntentStatusResult> {
   const result = await client.request({
     method: "rl_getUserIntentStatus",
-    params: [parameters.uiHash],
+    params: [
+      parameters.uiHash,
+      IntentVersionToAddressesMap[version].intentExecutorAddress,
+    ],
   });
 
   return result as GetUserIntentStatusResult;

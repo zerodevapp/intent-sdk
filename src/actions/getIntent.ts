@@ -1,6 +1,7 @@
 import type { Chain, Client, Hex, RpcErrorType, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
+import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import { deepHexlify } from "../utils/deepHexlify.js";
 
 export type GetIntentParameters = {
@@ -83,10 +84,15 @@ export async function getIntent<
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetIntentParameters,
+  version: INTENT_VERSION_TYPE,
 ): Promise<GetIntentReturnType> {
+  const parametersWithVersion = {
+    ...parameters,
+    version,
+  };
   const intent = (await client.request({
     method: "ui_getIntent",
-    params: [deepHexlify(parameters)],
+    params: [deepHexlify(parametersWithVersion)],
   })) as GetIntentReturnType;
 
   return intent;

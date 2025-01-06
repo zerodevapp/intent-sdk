@@ -1,6 +1,8 @@
 import type { Chain, Client, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
+import { IntentVersionToAddressesMap } from "../config/constants.js";
+import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import type {
   GetUserIntentReceiptParameters,
   GetUserIntentReceiptResult,
@@ -20,10 +22,14 @@ export async function getUserIntentOpenReceipt<
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetUserIntentReceiptParameters,
+  version: INTENT_VERSION_TYPE,
 ): Promise<GetUserIntentReceiptResult> {
   const result = await client.request({
     method: "rl_getUserIntentOpenReceipt",
-    params: [parameters.uiHash],
+    params: [
+      parameters.uiHash,
+      IntentVersionToAddressesMap[version].intentExecutorAddress,
+    ],
   });
 
   return result as GetUserIntentReceiptResult;

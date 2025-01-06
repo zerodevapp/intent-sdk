@@ -5,6 +5,7 @@ import {
 } from "@zerodev/sdk";
 import {
   http,
+  type Address,
   type Chain,
   type Client,
   type Hex,
@@ -30,6 +31,7 @@ import type { GetUserIntentStatusResult } from "../actions/getUserIntentStatus.j
 import type { SendUserIntentResult } from "../actions/sendUserIntent.js";
 import type { GetUserIntentReceiptResult } from "../actions/types.js";
 import { ZERODEV_URLS } from "../config/constants.js";
+import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import {
   type IntentClientActions,
   intentClientActions,
@@ -52,17 +54,17 @@ export type RelayerRpcSchema = [
   },
   {
     Method: "rl_getUserIntentStatus";
-    Parameters: [Hex];
+    Parameters: [Hex, Address];
     ReturnType: GetUserIntentStatusResult;
   },
   {
     Method: "rl_getUserIntentOpenReceipt";
-    Parameters: [Hex];
+    Parameters: [Hex, Address];
     ReturnType: GetUserIntentReceiptResult;
   },
   {
     Method: "rl_getUserIntentExecutionReceipt";
-    Parameters: [Hex];
+    Parameters: [Hex, Address];
     ReturnType: GetUserIntentReceiptResult;
   },
 ];
@@ -110,6 +112,7 @@ export type CreateIntentClientConfig<
   bundlerTransport: transport;
   intentTransport?: transport;
   relayerTransport?: transport;
+  version: INTENT_VERSION_TYPE;
 };
 
 export function createIntentClient<
@@ -141,6 +144,7 @@ export function createIntentClient(
     intentTransport = http(ZERODEV_URLS.INTENT_SERVICE),
     relayerTransport = http(ZERODEV_URLS.RELAYER_SERVICE_MAINNET),
     userOperation,
+    version,
   } = parameters;
 
   // Create a custom transport that routes methods to the appropriate transport
@@ -189,11 +193,11 @@ export function createIntentClient(
           return customPrepareUserOp(client, args);
         },
       }))
-      .extend(intentClientActions()) as IntentClient;
+      .extend(intentClientActions(version)) as IntentClient;
   }
 
   return client
     .extend(bundlerActions)
     .extend(kernelAccountClientActions())
-    .extend(intentClientActions()) as IntentClient;
+    .extend(intentClientActions(version)) as IntentClient;
 }

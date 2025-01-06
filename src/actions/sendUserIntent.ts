@@ -12,13 +12,14 @@ import {
 import type { SmartAccount } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
+import { SAME_CHAIN_ORDER_DATA_TYPE } from "../config/constants.js";
+import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import type {
   GaslessCrossChainOrder,
   GetIntentReturnType,
 } from "./getIntent.js";
 import type { PrepareUserIntentParameters } from "./prepareUserIntent.js";
 import { prepareUserIntent } from "./prepareUserIntent.js";
-import { SAME_CHAIN_ORDER_DATA_TYPE } from "../config/constants.js";
 
 export type SendUserIntentParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
@@ -76,6 +77,7 @@ export async function sendUserIntent<
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: SendUserIntentParameters<account, accountOverride, calls>,
+  version: INTENT_VERSION_TYPE,
 ): Promise<SendUserIntentResult> {
   const {
     account: account_ = client.account,
@@ -98,6 +100,7 @@ export async function sendUserIntent<
         accountOverride,
         calls
       >,
+      version,
     ));
 
   // Get the order hash
@@ -118,6 +121,7 @@ export async function sendUserIntent<
       {
         order: intent.order,
         signature: signature_,
+        version,
       },
     ],
   });
