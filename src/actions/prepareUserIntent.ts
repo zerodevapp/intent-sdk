@@ -36,11 +36,11 @@ export type PrepareUserIntentParameters<
     amount: bigint;
     chainId: number;
   }>;
-  gasTokens?: Array<{
+  gasToken?: {
     address: Hex;
     amount?: bigint;
     chainId: number;
-  }>;
+  };
   chainId?: number;
 };
 
@@ -113,7 +113,7 @@ export async function prepareUserIntent<
   ) as SmartAccount<KernelSmartAccountImplementation>;
 
   // Convert the user intent parameters to getIntent parameters
-  const { inputTokens, outputTokens, chainId, gasTokens } = parameters;
+  const { inputTokens, outputTokens, chainId, gasToken } = parameters;
 
   // Get callData from either direct callData or encoded calls
   const callData = await (async () => {
@@ -145,7 +145,7 @@ export async function prepareUserIntent<
     callData,
     inputTokens: inputTokens ?? [],
     outputTokens: outputTokens ?? [],
-    gasTokens: gasTokens ?? [],
+    gasToken: gasToken,
     chainId,
     initData,
   });
