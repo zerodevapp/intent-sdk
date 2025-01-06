@@ -18,6 +18,7 @@ import type {
 } from "./getIntent.js";
 import type { PrepareUserIntentParameters } from "./prepareUserIntent.js";
 import { prepareUserIntent } from "./prepareUserIntent.js";
+import { SAME_CHAIN_ORDER_DATA_TYPE } from "../config/constants.js";
 
 export type SendUserIntentParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
@@ -32,6 +33,26 @@ export type SendUserIntentResult = {
 };
 
 export const getOrderHash = (order: GaslessCrossChainOrder): Hex => {
+  if (
+    order.orderDataType.toLowerCase() ===
+    SAME_CHAIN_ORDER_DATA_TYPE.toLowerCase()
+  ) {
+    return keccak256(
+      encodeAbiParameters(
+        parseAbiParameters(
+          "address, uint256, uint32, uint32, bytes32, bytes32",
+        ),
+        [
+          order.user,
+          order.nonce,
+          order.openDeadline,
+          order.fillDeadline,
+          order.orderDataType,
+          keccak256(order.orderData),
+        ],
+      ),
+    );
+  }
   return keccak256(
     encodeAbiParameters(
       parseAbiParameters("address, uint32, uint32, bytes32, bytes32"),
