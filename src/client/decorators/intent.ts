@@ -39,6 +39,7 @@ import {
   type WaitForUserIntentOpenReceiptReturnType,
   waitForUserIntentOpenReceipt,
 } from "../../actions/waitForUserIntentOpenReceipt.js";
+import type { INTENT_VERSION_TYPE } from "../../types/intent.js";
 import type { CombinedIntentRpcSchema } from "../intentClient.js";
 
 export type IntentClientActions<
@@ -78,7 +79,9 @@ export type IntentClientActions<
   enableIntent: () => Promise<EnableIntentResult>;
 };
 
-export function intentClientActions(): <
+export function intentClientActions(
+  version: INTENT_VERSION_TYPE,
+): <
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
@@ -86,19 +89,20 @@ export function intentClientActions(): <
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
 ) => IntentClientActions<chain, account> {
   return (client) => ({
-    getIntent: (parameters) => getIntent(client, parameters),
-    prepareUserIntent: (parameters) => prepareUserIntent(client, parameters),
-    sendUserIntent: (parameters) => sendUserIntent(client, parameters),
+    getIntent: (parameters) => getIntent(client, parameters, version),
+    prepareUserIntent: (parameters) =>
+      prepareUserIntent(client, parameters, version),
+    sendUserIntent: (parameters) => sendUserIntent(client, parameters, version),
     getUserIntentStatus: (parameters) =>
-      getUserIntentStatus(client, parameters),
+      getUserIntentStatus(client, parameters, version),
     getUserIntentOpenReceipt: (parameters) =>
-      getUserIntentOpenReceipt(client, parameters),
+      getUserIntentOpenReceipt(client, parameters, version),
     getUserIntentExecutionReceipt: (parameters) =>
-      getUserIntentExecutionReceipt(client, parameters),
+      getUserIntentExecutionReceipt(client, parameters, version),
     waitForUserIntentExecutionReceipt: (parameters) =>
-      waitForUserIntentExecutionReceipt(client, parameters),
+      waitForUserIntentExecutionReceipt(client, parameters, version),
     waitForUserIntentOpenReceipt: (parameters) =>
-      waitForUserIntentOpenReceipt(client, parameters),
-    enableIntent: () => enableIntent(client),
+      waitForUserIntentOpenReceipt(client, parameters, version),
+    enableIntent: () => enableIntent(client, version),
   });
 }

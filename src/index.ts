@@ -33,7 +33,12 @@ export type {
 } from "./actions/waitForUserIntentOpenReceipt.js";
 export type { EnableIntentResult } from "./actions/enableIntent.js";
 
-export { INTENT_EXECUTOR } from "./config/constants.js";
+export {
+  INTENT_EXECUTOR,
+  INTENT_V0_1,
+  INTENT_V0_2,
+  IntentVersionToAddressesMap,
+} from "./config/constants.js";
 export {
   installIntentExecutor,
   getInstallIntentExecutorCall,

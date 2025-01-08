@@ -16,6 +16,7 @@ import {
 } from "viem/account-abstraction";
 import { getAction } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
+import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import { getInstallIntentExecutorCall } from "../utils/installIntentExecutor.js";
 
 export type EnableIntentResult = Hash;
@@ -34,6 +35,7 @@ export async function enableIntent<
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
+  version: INTENT_VERSION_TYPE,
 ): Promise<EnableIntentResult> {
   if (!client.account) throw new Error("Account not found");
   const account =
@@ -69,6 +71,7 @@ export async function enableIntent<
   // Add executor installation call
   const executorCall = await getInstallIntentExecutorCall({
     accountAddress: account.address,
+    version,
   });
   calls.push(executorCall);
 
