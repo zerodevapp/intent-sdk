@@ -8,29 +8,36 @@ import {
   zeroAddress,
 } from "viem";
 import type { UserOperationCall } from "viem/account-abstraction";
-import { INTENT_EXECUTOR } from "../config/constants.js";
+import { IntentVersionToAddressesMap } from "../config/constants.js";
+import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 
-export const installIntentExecutor = encodeFunctionData({
-  abi: KernelV3_1AccountAbi,
-  functionName: "installModule",
-  args: [
-    BigInt(2),
-    INTENT_EXECUTOR,
-    concatHex([
-      zeroAddress,
-      encodeAbiParameters(parseAbiParameters(["bytes", "bytes"]), ["0x", "0x"]),
-    ]),
-  ],
-});
+export const installIntentExecutor = (version: INTENT_VERSION_TYPE) =>
+  encodeFunctionData({
+    abi: KernelV3_1AccountAbi,
+    functionName: "installModule",
+    args: [
+      BigInt(2),
+      IntentVersionToAddressesMap[version].intentExecutorAddress,
+      concatHex([
+        zeroAddress,
+        encodeAbiParameters(parseAbiParameters(["bytes", "bytes"]), [
+          "0x",
+          "0x",
+        ]),
+      ]),
+    ],
+  });
 
 export const getInstallIntentExecutorCall = ({
   accountAddress,
+  version,
 }: {
   accountAddress: Address;
+  version: INTENT_VERSION_TYPE;
 }): UserOperationCall => {
   return {
     to: accountAddress,
-    data: installIntentExecutor,
+    data: installIntentExecutor(version),
     value: 0n,
   };
 };

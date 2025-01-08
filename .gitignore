@@ -25,4 +25,5 @@ node_modules/
 
 # TypeScript
 tsconfig.build.tsbuildinfo
+tsconfig.cjs.tsbuildinfo
 

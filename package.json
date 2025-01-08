@@ -1,6 +1,6 @@
 {
   "name": "@zerodev/intent",
-  "version": "0.0.7",
+  "version": "0.0.8-test.4",
   "type": "module",
   "main": "./_cjs/index.js",
   "module": "./_esm/index.js",
@@ -19,17 +19,13 @@
     "_esm",
     "_cjs",
     "_types",
-    "./src/**/*.ts",
-    "!_esm/**/*.tsbuildinfo",
-    "!_cjs/**/*.tsbuildinfo",
-    "!_types/**/*.tsbuildinfo",
-    "!src/**/*.test.ts"
+    "src"
   ],
   "scripts": {
     "build": "bun run clean && bun run build:cjs && bun run build:esm && bun run build:types",
-    "build:cjs": "mkdir -p _cjs && tsc --project ./tsconfig.build.json --module NodeNext --moduleResolution NodeNext --outDir ./_cjs --removeComments && printf '{\"type\":\"commonjs\"}' > ./_cjs/package.json",
-    "build:esm": "mkdir -p _esm && tsc --project ./tsconfig.build.json --module NodeNext --moduleResolution NodeNext --outDir ./_esm && printf '{\"type\": \"module\",\"sideEffects\":false}' > ./_esm/package.json",
-    "build:types": "tsc --project ./tsconfig.build.json --module NodeNext --moduleResolution NodeNext --declarationDir ./_types --emitDeclarationOnly --declaration --declarationMap",
+    "build:cjs": "tsc --project ./tsconfig.build.json --module commonjs --outDir ./_cjs --removeComments --verbatimModuleSyntax false && printf '{\"type\":\"commonjs\"}' > ./_cjs/package.json",
+    "build:esm": "tsc --project ./tsconfig.build.json --module es2015 --outDir ./_esm && printf '{\"type\": \"module\",\"sideEffects\":false}' > ./_esm/package.json",
+    "build:types": "tsc --project ./tsconfig.build.json --module esnext --declarationDir ./_types --emitDeclarationOnly --declaration --declarationMap",
     "clean": "rm -rf _esm _cjs _types",
     "format": "biome format . --write",
     "lint": "biome check .",

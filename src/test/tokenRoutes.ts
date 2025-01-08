@@ -857,6 +857,84 @@ export const BSC_TOKEN_ROUTES: TokenRoute = {
   ],
 };
 
+export const MAINNET_TOKEN_ROUTES_SAME_CHAIN: TokenRoute[] = [
+  {
+    chain: mainnet,
+    routes: [
+      {
+        name: "mainnet usdc <-> mainnet usdc",
+        inputTokens: [
+          {
+            chainId: mainnet.id,
+            address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          },
+        ],
+        outputTokens: [],
+      },
+    ],
+  },
+  {
+    chain: optimism,
+    routes: [
+      {
+        name: "optimism usdc <-> optimism usdc",
+        inputTokens: [
+          {
+            chainId: optimism.id,
+            address: "0x0b2c639c533813f4aa9d7837caf62653d097ff85",
+          },
+        ],
+        outputTokens: [],
+      },
+    ],
+  },
+  {
+    chain: arbitrum,
+    routes: [
+      {
+        name: "arbitrum usdc <-> arbitrum usdc",
+        inputTokens: [
+          {
+            chainId: arbitrum.id,
+            address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          },
+        ],
+        outputTokens: [],
+      },
+    ],
+  },
+  {
+    chain: base,
+    routes: [
+      {
+        name: "base usdc <-> base usdc",
+        inputTokens: [
+          {
+            chainId: base.id,
+            address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          },
+        ],
+        outputTokens: [],
+      },
+    ],
+  },
+  {
+    chain: bsc,
+    routes: [
+      {
+        name: "bsc usdc <-> bsc usdc",
+        inputTokens: [
+          {
+            chainId: bsc.id,
+            address: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          },
+        ],
+        outputTokens: [],
+      },
+    ],
+  },
+];
+
 export const TESTNET_TOKEN_ROUTES: TokenRoute[] = [
   SEPOLIA_TOKEN_ROUTES,
   BASE_SEPOLIA_TOKEN_ROUTES,

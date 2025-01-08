@@ -2,6 +2,7 @@ import type { Chain, Client, Hex, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import { stringify } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
+import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import { observe } from "../utils/observe.js";
 import { poll } from "../utils/poll.js";
 import { getUserIntentExecutionReceipt } from "./getUserIntentExecutionReceipt.js";
@@ -67,6 +68,7 @@ export function waitForUserIntentExecutionReceipt<
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: WaitForUserIntentExecutionReceiptParameters,
+  version: INTENT_VERSION_TYPE,
 ): Promise<WaitForUserIntentExecutionReceiptReturnType> {
   const {
     uiHash,
@@ -100,9 +102,13 @@ export function waitForUserIntentExecutionReceipt<
             );
 
           try {
-            const receipt = await getUserIntentExecutionReceipt(client, {
-              uiHash,
-            });
+            const receipt = await getUserIntentExecutionReceipt(
+              client,
+              {
+                uiHash,
+              },
+              version,
+            );
             if (receipt) done(() => emit.resolve(receipt));
           } catch (err) {
             done(() => emit.reject(err));

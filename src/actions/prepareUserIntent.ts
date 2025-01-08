@@ -18,6 +18,7 @@ import type {
 } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
+import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import type { GetIntentReturnType } from "./getIntent.js";
 import { getIntent } from "./getIntent.js";
 
@@ -26,16 +27,22 @@ export type PrepareUserIntentParameters<
   accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
   calls extends readonly unknown[] = readonly unknown[],
 > = PrepareUserOperationParameters<account, accountOverride, calls> & {
-  inputTokens: Array<{
+  inputTokens?: Array<{
     address: Hex;
     amount?: bigint;
     chainId: number;
   }>;
-  outputTokens: Array<{
+  outputTokens?: Array<{
     address: Hex;
     amount: bigint;
     chainId: number;
   }>;
+  gasToken?: {
+    address: Hex;
+    amount?: bigint;
+    chainId: number;
+  };
+  chainId?: number;
 };
 
 export type PrepareUserIntentResult = GetIntentReturnType;
@@ -98,6 +105,7 @@ export async function prepareUserIntent<
 >(
   client: Client<Transport, chain, account, CombinedIntentRpcSchema>,
   parameters: PrepareUserIntentParameters<account, accountOverride, calls>,
+  version: INTENT_VERSION_TYPE,
 ): Promise<PrepareUserIntentResult> {
   const { account: account_ = client.account } = parameters;
   if (!account_) throw new AccountNotFoundError();
@@ -107,7 +115,7 @@ export async function prepareUserIntent<
   ) as SmartAccount<KernelSmartAccountImplementation>;
 
   // Convert the user intent parameters to getIntent parameters
-  const { inputTokens, outputTokens } = parameters;
+  const { inputTokens, outputTokens, chainId, gasToken } = parameters;
 
   // Get callData from either direct callData or encoded calls
   const callData = await (async () => {
@@ -134,11 +142,17 @@ export async function prepareUserIntent<
   const initData = concatHex([factoryAddress, factoryData]);
 
   // Call getIntent with the converted parameters
-  return getIntent(client, {
-    recipient: account.address,
-    callData,
-    inputTokens,
-    outputTokens,
-    initData,
-  });
+  return getIntent(
+    client,
+    {
+      recipient: account.address,
+      callData,
+      inputTokens: inputTokens ?? [],
+      outputTokens: outputTokens ?? [],
+      gasToken: gasToken,
+      chainId,
+      initData,
+    },
+    version,
+  );
 }

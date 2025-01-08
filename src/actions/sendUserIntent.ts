@@ -12,6 +12,8 @@ import {
 import type { SmartAccount } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
+import { SAME_CHAIN_ORDER_DATA_TYPE } from "../config/constants.js";
+import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import type {
   GaslessCrossChainOrder,
   GetIntentReturnType,
@@ -32,6 +34,26 @@ export type SendUserIntentResult = {
 };
 
 export const getOrderHash = (order: GaslessCrossChainOrder): Hex => {
+  if (
+    order.orderDataType.toLowerCase() ===
+    SAME_CHAIN_ORDER_DATA_TYPE.toLowerCase()
+  ) {
+    return keccak256(
+      encodeAbiParameters(
+        parseAbiParameters(
+          "address, uint256, uint32, uint32, bytes32, bytes32",
+        ),
+        [
+          order.user,
+          order.nonce,
+          order.openDeadline,
+          order.fillDeadline,
+          order.orderDataType,
+          keccak256(order.orderData),
+        ],
+      ),
+    );
+  }
   return keccak256(
     encodeAbiParameters(
       parseAbiParameters("address, uint32, uint32, bytes32, bytes32"),
@@ -55,6 +77,7 @@ export async function sendUserIntent<
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: SendUserIntentParameters<account, accountOverride, calls>,
+  version: INTENT_VERSION_TYPE,
 ): Promise<SendUserIntentResult> {
   const {
     account: account_ = client.account,
@@ -77,6 +100,7 @@ export async function sendUserIntent<
         accountOverride,
         calls
       >,
+      version,
     ));
 
   // Get the order hash
@@ -97,6 +121,7 @@ export async function sendUserIntent<
       {
         order: intent.order,
         signature: signature_,
+        version,
       },
     ],
   });
