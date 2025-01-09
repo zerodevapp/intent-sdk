@@ -12,7 +12,7 @@ bun add @zerodev/intent
 
 ```typescript
 import { createIntentClient } from '@zerodev/intent'
-import { mainnet } from 'viem/chains'
+import { mainnet, polygon, base, optimism } from 'viem/chains'
 
 const client = createIntentClient({
   chain: mainnet,
@@ -73,6 +73,42 @@ const openReceipt = await client.waitForUserIntentOpenReceipt({
 const executionReceipt = await client.waitForUserIntentExecutionReceipt({
   uiHash: result1.uiHash, // or result2.uiHash
 });
+
+// Get consolidated account balances
+// Using connected account
+const balances1 = await client.getCAB({
+  networkType: "mainnet" // or "testnet"
+})
+
+// Using specific address with network filter
+const balances2 = await client.getCAB({
+  accountAddress: "0x...",
+  tokenTickers: ["ETH", "USDC"],
+  networks: [mainnet.id, polygon.id] // Using viem chain IDs
+})
+
+// Example response structure
+const balances = await client.getCAB({
+  networks: [base.id, optimism.id],
+  tokenTickers: ["USDC"]
+})
+// Response:
+{
+  tokens: [{
+    ticker: "USDC",
+    amount: "0x1234...", // Normalized total amount across chains (using decimal field)
+    decimal: 6,          // Lowest decimal among all chains (for normalization)
+    breakdown: [{
+      chainId: 8453,     // base chain ID
+      address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      amount: "0x0abc..."  // Original amount with chain-specific decimals (6)
+    }, {
+      chainId: 10,       // optimism chain ID
+      address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+      amount: "0x0def..."  // Original amount with chain-specific decimals (6)
+    }]
+  }]
+}
 ```
 
 ## Features
@@ -82,6 +118,14 @@ const executionReceipt = await client.waitForUserIntentExecutionReceipt({
   - Direct send flow
   - Prepare-then-send flow
 - Intent status tracking
+- Consolidated account balances across chains
+  - Filter by network type (mainnet/testnet)
+  - Filter by specific networks using viem chains
+  - Filter by token tickers
+  - Automatic amount normalization to lowest decimal
+    - Root level amount is normalized across chains
+    - Breakdown amounts preserve chain-specific decimals
+    - Handles tokens with different decimals (e.g., USDC 6 on Base vs 18 on BNB)
 - Type-safe API
 - Built with Bun and TypeScript
 
