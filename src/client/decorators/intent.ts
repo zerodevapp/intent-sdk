@@ -5,15 +5,15 @@ import {
   enableIntent,
 } from "../../actions/enableIntent.js";
 import {
-  type GetIntentParameters,
-  type GetIntentReturnType,
-  getIntent,
-} from "../../actions/getIntent.js";
-import {
   type GetCABParameters,
   type GetCABResult,
   getCAB,
 } from "../../actions/getCAB.js";
+import {
+  type GetIntentParameters,
+  type GetIntentReturnType,
+  getIntent,
+} from "../../actions/getIntent.js";
 import { getUserIntentExecutionReceipt } from "../../actions/getUserIntentExecutionReceipt.js";
 import { getUserIntentOpenReceipt } from "../../actions/getUserIntentOpenReceipt.js";
 import {

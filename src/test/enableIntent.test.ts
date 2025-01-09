@@ -12,6 +12,7 @@ import {
 import { http, zeroAddress } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { createIntentClient } from "../client/intentClient.js";
+import { INTENT_V0_1 } from "../config/constants.js";
 import {
   BUNDLER_RPC,
   PAYMASTER_RPC,
@@ -20,7 +21,6 @@ import {
   index,
   timeout,
 } from "./utils.js";
-import { INTENT_V0_1 } from "../config/constants.js";
 
 describe("enableIntent", () => {
   test(

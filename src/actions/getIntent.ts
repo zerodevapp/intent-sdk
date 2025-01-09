@@ -19,11 +19,11 @@ export type GetIntentParameters = {
   }>;
   initData?: Hex | undefined;
   // same-chain
-  gasToken?: {
+  gasTokens?: Array<{
     address: Hex;
     amount?: bigint;
     chainId: number;
-  };
+  }>;
   chainId?: number;
 };
 
