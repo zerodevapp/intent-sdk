@@ -88,7 +88,7 @@ export async function getIntentClient(
     client: publicClient,
     version: INTENT_V0_1,
     // intentTransport: http(INTENT_SERVICE_RPC),
-    relayerTransport: http(RELAYER_SERVICE_RPC),
+    // relayerTransport: http(RELAYER_SERVICE_RPC),
   });
   return client;
 }

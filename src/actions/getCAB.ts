@@ -2,6 +2,8 @@ import type { Chain, Client, Hex, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 
+export type NetworkType = "mainnet" | "testnet";
+
 export type TokenBreakdown = {
   chainId: number;
   address: Hex;
@@ -15,21 +17,34 @@ export type TokenBalance = {
   breakdown: TokenBreakdown[];
 };
 
-export type GetCABParameters = {
+type BaseCABParameters = {
   accountAddress: Hex;
   tokenTickers?: string[];
 };
+
+type NetworkFilterParameters = BaseCABParameters & {
+  networks: number[];
+  networkType?: never;
+};
+
+type NetworkTypeParameters = BaseCABParameters & {
+  networks?: never;
+  networkType?: NetworkType;
+};
+
+export type GetCABParameters = NetworkFilterParameters | NetworkTypeParameters;
 
 export type GetCABResult = {
   tokens: TokenBalance[];
 };
 
 /**
- * Gets Current Account Balances (CAB) for a specified account address.
+ * Gets Consolidated Account Balances (CAB) for a specified account address.
+ * Returns token balances across supported chains with optional filtering by networks and tokens.
  *
  * @param client - Client to use
  * @param parameters - {@link GetCABParameters}
- * @returns The account balances. {@link GetCABResult}
+ * @returns The consolidated account balances. {@link GetCABResult}
  *
  * @example
  * import { createIntentClient, http } from '@zerodev/intent'
@@ -40,10 +55,27 @@ export type GetCABResult = {
  *   transport: http(),
  * })
  *
- * const balances = await client.getCAB({
+ * // Get all balances on mainnet networks
+ * const balances1 = await client.getCAB({
  *   accountAddress: "0x...",
- *   tokenTickers: ["ETH", "USDC"]
+ *   networkType: "mainnet"
  * })
+ *
+ * // Get specific tokens on specific networks
+ * const balances2 = await client.getCAB({
+ *   accountAddress: "0x...",
+ *   tokenTickers: ["ETH", "USDC"],
+ *   networks: [1, 137]  // Ethereum mainnet and Polygon
+ * })
+ *
+ * // Get all tokens on testnet networks
+ * const balances3 = await client.getCAB({
+ *   accountAddress: "0x...",
+ *   networkType: "testnet"
+ * })
+ *
+ * @throws {Error} If mixing mainnet and testnet networks when using networks parameter
+ * @throws {Error} If any specified network is unsupported
  */
 export async function getCAB<
   transport extends Transport = Transport,
