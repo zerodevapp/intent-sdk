@@ -32,6 +32,12 @@ export type {
   WaitForUserIntentOpenReceiptReturnType,
 } from "./actions/waitForUserIntentOpenReceipt.js";
 export type { EnableIntentResult } from "./actions/enableIntent.js";
+export type {
+  GetCABParameters,
+  GetCABResult,
+  TokenBalance,
+  TokenBreakdown,
+} from "./actions/getCAB.js";
 
 export {
   INTENT_EXECUTOR,
@@ -43,3 +49,4 @@ export {
   installIntentExecutor,
   getInstallIntentExecutorCall,
 } from "./utils/installIntentExecutor.js";
+export { getCAB } from "./actions/getCAB.js";

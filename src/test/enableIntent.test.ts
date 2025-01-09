@@ -20,6 +20,7 @@ import {
   index,
   timeout,
 } from "./utils.js";
+import { INTENT_V0_1 } from "../config/constants.js";
 
 describe("enableIntent", () => {
   test(
@@ -56,6 +57,7 @@ describe("enableIntent", () => {
           transport: http(PAYMASTER_RPC, { timeout }),
         }),
         client: publicClient,
+        version: INTENT_V0_1,
       });
       // Dummy transaction to deploy the kernel
       const tx = await client.sendTransaction({
@@ -98,6 +100,7 @@ describe("enableIntent", () => {
           transport: http(PAYMASTER_RPC, { timeout }),
         }),
         client: publicClient,
+        version: INTENT_V0_1,
       });
       const newTx = await newClient.sendTransaction({
         to: zeroAddress,
