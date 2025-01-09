@@ -36,6 +36,7 @@ import {
   type IntentClientActions,
   intentClientActions,
 } from "./decorators/intent.js";
+import type { GetCABParameters, GetCABResult } from "../actions/getCAB.js";
 
 export type IntentRpcSchema = [
   {
@@ -43,6 +44,11 @@ export type IntentRpcSchema = [
     Parameters: [GetIntentParameters];
     ReturnType: GetIntentReturnType;
   },
+  {
+    Method: "ui_getCAB";
+    Parameters: [GetCABParameters];
+    ReturnType: GetCABResult;
+  }
 ];
 
 // Relayer methods
@@ -66,7 +72,7 @@ export type RelayerRpcSchema = [
     Method: "rl_getUserIntentExecutionReceipt";
     Parameters: [Hex, Address];
     ReturnType: GetUserIntentReceiptResult;
-  },
+  }
 ];
 
 // Combined schema for the Intent client

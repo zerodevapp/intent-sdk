@@ -9,6 +9,11 @@ import {
   type GetIntentReturnType,
   getIntent,
 } from "../../actions/getIntent.js";
+import {
+  type GetCABParameters,
+  type GetCABResult,
+  getCAB,
+} from "../../actions/getCAB.js";
 import { getUserIntentExecutionReceipt } from "../../actions/getUserIntentExecutionReceipt.js";
 import { getUserIntentOpenReceipt } from "../../actions/getUserIntentOpenReceipt.js";
 import {
@@ -47,6 +52,7 @@ export type IntentClientActions<
   account extends SmartAccount | undefined = SmartAccount | undefined,
 > = {
   getIntent: (parameters: GetIntentParameters) => Promise<GetIntentReturnType>;
+  getCAB: (parameters: GetCABParameters) => Promise<GetCABResult>;
   prepareUserIntent: <
     accountOverride extends SmartAccount | undefined = undefined,
     calls extends readonly unknown[] = readonly unknown[],
@@ -90,6 +96,7 @@ export function intentClientActions(
 ) => IntentClientActions<chain, account> {
   return (client) => ({
     getIntent: (parameters) => getIntent(client, parameters, version),
+    getCAB: (parameters) => getCAB(client, parameters),
     prepareUserIntent: (parameters) =>
       prepareUserIntent(client, parameters, version),
     sendUserIntent: (parameters) => sendUserIntent(client, parameters, version),
