@@ -1,16 +1,17 @@
 import { describe, expect, test } from "bun:test";
+import { createKernelAccount } from "@zerodev/sdk";
+import { getEntryPoint } from "@zerodev/sdk/constants";
 import { sepolia } from "viem/chains";
-import { getIntentClient, getTestingChain } from "./utils.js";
+import { privateKeyToAccount } from "viem/accounts";
+import { getIntentClient, getTestingChain, getPublicClient, kernelVersion } from "./utils.js";
+import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator";
 import * as allChains from "viem/chains";
 
 describe("getCAB", () => {
-  test("should get balances with token filter", async () => {
+  test("should get balances using connected account", async () => {
     const client = await getIntentClient(getTestingChain());
-    const accountAddress = client.account?.address;
-    if (!accountAddress) throw new Error("Account not found");
 
     const result = await client.getCAB({
-      accountAddress,
       tokenTickers: ["ETH", "USDC"],
       networkType: "testnet",
     });
@@ -33,13 +34,12 @@ describe("getCAB", () => {
     });
   });
 
-  test("should get balances with network filter", async () => {
+  test("should get balances using specific address", async () => {
     const client = await getIntentClient(getTestingChain());
-    const accountAddress = client.account?.address;
-    if (!accountAddress) throw new Error("Account not found");
+    const someAddress = "0x1234567890123456789012345678901234567890";
 
     const result = await client.getCAB({
-      accountAddress,
+      accountAddress: someAddress,
       networks: [sepolia.id],
     });
 
@@ -52,21 +52,32 @@ describe("getCAB", () => {
     }
   });
 
-  test("should get balances with networkType", async () => {
-    const client = await getIntentClient(getTestingChain());
-    const accountAddress = client.account?.address;
-    if (!accountAddress) throw new Error("Account not found");
+  test("should get balances using specific account", async () => {
+    const publicClient = getPublicClient();
+    const signer = privateKeyToAccount("0x1234567890123456789012345678901234567890123456789012345678901234");
+    const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
+      signer,
+      kernelVersion,
+      entryPoint: getEntryPoint("0.7"),
+    });
 
+    const kernelAccount = await createKernelAccount(publicClient, {
+      plugins: {
+        sudo: ecdsaValidator,
+      },
+      kernelVersion,
+      entryPoint: getEntryPoint("0.7"),
+    });
+
+    const client = await getIntentClient(getTestingChain());
     const result = await client.getCAB({
-      accountAddress,
+      account: kernelAccount,
       networkType: "testnet",
     });
 
     expect(result.tokens).toBeDefined();
-    expect(result.tokens.length).toBeGreaterThanOrEqual(0);
     for (const token of result.tokens) {
       for (const b of token.breakdown) {
-        // filter out allChain based on chainId and check if `testnet` is truthy
         const chain = Object.values(allChains)
           .filter((c) => typeof c === "object" && c !== null)
           .find((c) => c.id === b.chainId);
@@ -77,11 +88,8 @@ describe("getCAB", () => {
 
   test("should normalize amounts to lowest decimal", async () => {
     const client = await getIntentClient(getTestingChain());
-    const accountAddress = client.account?.address;
-    if (!accountAddress) throw new Error("Account not found");
 
     const result = await client.getCAB({
-      accountAddress,
       tokenTickers: ["USDC"],
       networks: [sepolia.id],
     });
@@ -92,7 +100,7 @@ describe("getCAB", () => {
       const totalAmount = BigInt(token.amount);
       const breakdownSum = token.breakdown.reduce(
         (sum, b) => sum + BigInt(b.amount),
-        0n
+        0n,
       );
       expect(totalAmount).toBe(breakdownSum);
     }

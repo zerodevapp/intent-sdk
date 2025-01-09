@@ -1,3 +1,4 @@
+import { AccountNotFoundError } from "@zerodev/sdk";
 import type { Chain, Client, Hex, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
@@ -18,7 +19,8 @@ export type TokenBalance = {
 };
 
 type BaseCABParameters = {
-  accountAddress: Hex;
+  account?: SmartAccount;
+  accountAddress?: Hex;
   tokenTickers?: string[];
 };
 
@@ -55,39 +57,48 @@ export type GetCABResult = {
  *   transport: http(),
  * })
  *
- * // Get all balances on mainnet networks
+ * // Get balances for connected account on mainnet networks
  * const balances1 = await client.getCAB({
- *   accountAddress: "0x...",
  *   networkType: "mainnet"
  * })
  *
- * // Get specific tokens on specific networks
+ * // Get specific tokens for specific address on specific networks
  * const balances2 = await client.getCAB({
  *   accountAddress: "0x...",
  *   tokenTickers: ["ETH", "USDC"],
  *   networks: [1, 137]  // Ethereum mainnet and Polygon
  * })
  *
- * // Get all tokens on testnet networks
+ * // Get all tokens for connected account on testnet networks
  * const balances3 = await client.getCAB({
- *   accountAddress: "0x...",
  *   networkType: "testnet"
  * })
  *
+ * // Get balances using a specific account
+ * const balances4 = await client.getCAB({
+ *   account: kernelAccount,
+ *   networkType: "testnet"
+ * })
+ *
+ * @throws {Error} If no account is connected and no accountAddress or account is provided
  * @throws {Error} If mixing mainnet and testnet networks when using networks parameter
  * @throws {Error} If any specified network is unsupported
  */
 export async function getCAB<
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
-  account extends SmartAccount | undefined = SmartAccount | undefined,
+  account extends SmartAccount | undefined = SmartAccount | undefined
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
-  parameters: GetCABParameters,
+  parameters: GetCABParameters
 ): Promise<GetCABResult> {
+  const { account: account_ = client.account } = parameters;
+  const accountAddress = parameters.accountAddress ?? account_?.address;
+  if (!accountAddress) throw new AccountNotFoundError();
+
   const result = await client.request({
     method: "ui_getCAB",
-    params: [parameters],
+    params: [{ ...parameters, accountAddress }],
   });
 
   return result as GetCABResult;
