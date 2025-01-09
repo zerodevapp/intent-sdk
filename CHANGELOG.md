@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.8
+
+### Patch Changes
+
+- feat: add getCAB action
+
 ## 0.0.6
 
 ### Patch Changes
