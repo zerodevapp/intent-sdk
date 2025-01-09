@@ -25,7 +25,7 @@ export const SEPOLIA_PROJECT_ID = process.env.SEPOLIA_PROJECT_ID;
 export const BUNDLER_RPC = `https://rpc.zerodev.app/api/v2/bundler/${SEPOLIA_PROJECT_ID}`;
 export const PAYMASTER_RPC = `https://rpc.zerodev.app/api/v2/paymaster/${SEPOLIA_PROJECT_ID}`;
 export const INTENT_SERVICE_RPC = "http://127.0.0.1:3000/intent";
-export const RELAYER_SERVICE_RPC = "http://127.0.0.1:8080";
+export const RELAYER_SERVICE_RPC = `https://relayer-testnet.onrender.com/${SEPOLIA_PROJECT_ID}`;
 export const kernelVersion = KERNEL_V3_2;
 const entryPoint = getEntryPoint("0.7");
 const intentExecutorAddress = "0x3E1bF561DEbE46C22cc1e85EC8283A5EB49f5dae"; // "0xcEa9E1ED495f549E2ecEfc5f66b5e82c8F63af6D";
@@ -88,7 +88,7 @@ export async function getIntentClient(
     client: publicClient,
     version: INTENT_V0_1,
     // intentTransport: http(INTENT_SERVICE_RPC),
-    // relayerTransport: http(RELAYER_SERVICE_RPC),
+    relayerTransport: http(RELAYER_SERVICE_RPC),
   });
   return client;
 }

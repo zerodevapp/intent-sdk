@@ -22,6 +22,7 @@ import {
   type SmartAccount,
   bundlerActions,
 } from "viem/account-abstraction";
+import type { GetCABParameters, GetCABResult } from "../actions/getCAB.js";
 import type {
   GaslessCrossChainOrder,
   GetIntentParameters,
@@ -36,7 +37,6 @@ import {
   type IntentClientActions,
   intentClientActions,
 } from "./decorators/intent.js";
-import type { GetCABParameters, GetCABResult } from "../actions/getCAB.js";
 
 export type IntentRpcSchema = [
   {
@@ -48,7 +48,7 @@ export type IntentRpcSchema = [
     Method: "ui_getCAB";
     Parameters: [GetCABParameters];
     ReturnType: GetCABResult;
-  }
+  },
 ];
 
 // Relayer methods
@@ -72,7 +72,7 @@ export type RelayerRpcSchema = [
     Method: "rl_getUserIntentExecutionReceipt";
     Parameters: [Hex, Address];
     ReturnType: GetUserIntentReceiptResult;
-  }
+  },
 ];
 
 // Combined schema for the Intent client

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { getTestingChain, getIntentClient } from "./utils.js";
+import { getIntentClient, getTestingChain } from "./utils.js";
 
 test("getCAB", async () => {
   const client = await getIntentClient(getTestingChain());
@@ -28,4 +28,4 @@ test("getCAB", async () => {
       }),
     ]),
   });
-}); 
+});

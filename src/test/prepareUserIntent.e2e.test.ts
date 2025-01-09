@@ -106,7 +106,7 @@ describe.skip("same-chain prepareUserIntent with MAINNET_TOKEN_ROUTES_SAME_CHAIN
             },
           ],
           chainId: routesWithChain.chain.id,
-          gasToken: route.inputTokens[0],
+          gasTokens: route.inputTokens,
           inputTokens: route.inputTokens,
           outputTokens: route.outputTokens,
         });
