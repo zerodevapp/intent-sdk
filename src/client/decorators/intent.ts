@@ -5,6 +5,10 @@ import {
   enableIntent,
 } from "../../actions/enableIntent.js";
 import {
+  type EstimateUserIntentFeesResult,
+  estimateUserIntentFees,
+} from "../../actions/estimateUserIntentFees.js";
+import {
   type GetCABParameters,
   type GetCABResult,
   getCAB,
@@ -67,6 +71,14 @@ export type IntentClientActions<
   >(
     parameters: SendUserIntentParameters<account, accountOverride, calls>,
   ) => Promise<SendUserIntentResult>;
+  estimateUserIntentFees: <
+    accountOverride extends SmartAccount | undefined = undefined,
+    calls extends readonly unknown[] = readonly unknown[],
+  >(
+    parameters: Parameters<
+      typeof estimateUserIntentFees<account, chain, accountOverride, calls>
+    >[1],
+  ) => Promise<EstimateUserIntentFeesResult>;
   getUserIntentStatus: (
     parameters: GetUserIntentStatusParameters,
   ) => Promise<GetUserIntentStatusResult>;
@@ -100,6 +112,8 @@ export function intentClientActions(
     prepareUserIntent: (parameters) =>
       prepareUserIntent(client, parameters, version),
     sendUserIntent: (parameters) => sendUserIntent(client, parameters, version),
+    estimateUserIntentFees: (parameters) =>
+      estimateUserIntentFees(client, parameters, version),
     getUserIntentStatus: (parameters) =>
       getUserIntentStatus(client, parameters, version),
     getUserIntentOpenReceipt: (parameters) =>
