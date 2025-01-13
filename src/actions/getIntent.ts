@@ -23,7 +23,7 @@ export type GetIntentParameters = {
     address: Hex;
     amount?: bigint;
     chainId: number;
-  }>;
+  }> | "CAB";
   chainId?: number;
 };
 

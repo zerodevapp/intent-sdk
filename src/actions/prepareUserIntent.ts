@@ -41,7 +41,7 @@ export type PrepareUserIntentParameters<
     address: Hex;
     amount?: bigint;
     chainId: number;
-  }>;
+  }> | "CAB";
   chainId?: number;
 };
 

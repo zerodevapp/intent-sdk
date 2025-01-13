@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.9
+
+### Patch Changes
+
+- feat: add gasTokens: "CAB" feature
+
 ## 0.0.8
 
 ### Patch Changes

@@ -1,5 +1,5 @@
 import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator";
-import { KernelV3_1AccountAbi, createKernelAccount } from "@zerodev/sdk";
+import { KernelV3_1AccountAbi, createKernelAccount, createZeroDevPaymasterClient } from "@zerodev/sdk";
 import { KERNEL_V3_2, getEntryPoint } from "@zerodev/sdk/constants";
 import {
   http,
@@ -85,6 +85,10 @@ export async function getIntentClient(
     account: kernelAccount,
     chain: getTestingChain(),
     bundlerTransport: http(BUNDLER_RPC, { timeout }),
+    paymaster: createZeroDevPaymasterClient({
+      chain: getTestingChain(),
+      transport: http(PAYMASTER_RPC, { timeout }),
+    }),
     client: publicClient,
     version: INTENT_V0_1,
     // intentTransport: http(INTENT_SERVICE_RPC),
