@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.10
+
+### Patch Changes
+
+- feat: add fee estimation
+
 ## 0.0.9
 
 ### Patch Changes

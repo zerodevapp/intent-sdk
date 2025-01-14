@@ -22,6 +22,10 @@ import {
   type SmartAccount,
   bundlerActions,
 } from "viem/account-abstraction";
+import type {
+  EstimateUserIntentFeesParameters,
+  EstimateUserIntentFeesResult,
+} from "../actions/estimateUserIntentFees.js";
 import type { GetCABParameters, GetCABResult } from "../actions/getCAB.js";
 import type {
   GaslessCrossChainOrder,
@@ -48,6 +52,11 @@ export type IntentRpcSchema = [
     Method: "ui_getCAB";
     Parameters: [GetCABParameters];
     ReturnType: GetCABResult;
+  },
+  {
+    Method: "ui_estimateIntentFees";
+    Parameters: [EstimateUserIntentFeesParameters];
+    ReturnType: EstimateUserIntentFeesResult;
   },
 ];
 
