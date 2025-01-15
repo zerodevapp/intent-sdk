@@ -10,6 +10,7 @@ import {
 import type { UserOperationCall } from "viem/account-abstraction";
 import { IntentVersionToAddressesMap } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
+import type { PluginMigrationData } from "@zerodev/sdk/types";
 
 export const installIntentExecutor = (version: INTENT_VERSION_TYPE) =>
   encodeFunctionData({
@@ -39,5 +40,18 @@ export const getInstallIntentExecutorCall = ({
     to: accountAddress,
     data: installIntentExecutor(version),
     value: 0n,
+  };
+};
+
+export const getIntentExecutorPluginData = (
+  version: INTENT_VERSION_TYPE
+): PluginMigrationData => {
+  return {
+    type: 2,
+    address: IntentVersionToAddressesMap[version].intentExecutorAddress,
+    data: concatHex([
+      zeroAddress,
+      encodeAbiParameters(parseAbiParameters(["bytes", "bytes"]), ["0x", "0x"]),
+    ]),
   };
 };

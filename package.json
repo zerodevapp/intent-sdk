@@ -1,6 +1,6 @@
 {
   "name": "@zerodev/intent",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "type": "module",
   "main": "./_cjs/index.js",
   "module": "./_esm/index.js",
@@ -56,7 +56,7 @@
     "viem": "^2.21.40"
   },
   "dependencies": {
-    "@zerodev/sdk": "^5.4.9",
+    "@zerodev/sdk": "^5.4.10",
     "@zerodev/ecdsa-validator": "^5.4.1"
   }
 }
