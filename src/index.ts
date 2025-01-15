@@ -48,5 +48,6 @@ export {
 export {
   installIntentExecutor,
   getInstallIntentExecutorCall,
+  getIntentExecutorPluginData
 } from "./utils/installIntentExecutor.js";
 export { getCAB } from "./actions/getCAB.js";
