@@ -87,10 +87,10 @@ export type GetCABResult = {
 export async function getCAB<
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
-  account extends SmartAccount | undefined = SmartAccount | undefined
+  account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
-  parameters: GetCABParameters
+  parameters: GetCABParameters,
 ): Promise<GetCABResult> {
   const { account: account_ = client.account } = parameters;
   const accountAddress = parameters.accountAddress ?? account_?.address;

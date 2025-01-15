@@ -1,4 +1,5 @@
 import { KernelV3_1AccountAbi } from "@zerodev/sdk";
+import type { PluginMigrationData } from "@zerodev/sdk/types";
 import {
   type Address,
   concatHex,
@@ -10,7 +11,6 @@ import {
 import type { UserOperationCall } from "viem/account-abstraction";
 import { IntentVersionToAddressesMap } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
-import type { PluginMigrationData } from "@zerodev/sdk/types";
 
 export const installIntentExecutor = (version: INTENT_VERSION_TYPE) =>
   encodeFunctionData({
@@ -44,7 +44,7 @@ export const getInstallIntentExecutorCall = ({
 };
 
 export const getIntentExecutorPluginData = (
-  version: INTENT_VERSION_TYPE
+  version: INTENT_VERSION_TYPE,
 ): PluginMigrationData => {
   return {
     type: 2,

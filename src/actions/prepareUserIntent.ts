@@ -37,11 +37,13 @@ export type PrepareUserIntentParameters<
     amount: bigint;
     chainId: number;
   }>;
-  gasTokens?: Array<{
-    address: Hex;
-    amount?: bigint;
-    chainId: number;
-  }> | "CAB";
+  gasTokens?:
+    | Array<{
+        address: Hex;
+        amount?: bigint;
+        chainId: number;
+      }>
+    | "CAB";
   chainId?: number;
 };
 

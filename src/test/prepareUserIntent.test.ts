@@ -31,7 +31,7 @@ describe("prepareUserIntent", () => {
           amount: parseUnits("0.6", 6),
         },
       ],
-      gasTokens: "CAB"
+      gasTokens: "CAB",
       // [
       //   {
       //     chainId: base.id,
