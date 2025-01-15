@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.13
+
+### Patch Changes
+
+- chore: update intentExecutor v2 address
+
 ## 0.0.10
 
 ### Patch Changes

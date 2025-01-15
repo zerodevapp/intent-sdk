@@ -10,12 +10,9 @@ export const ZERODEV_URLS = {
   RELAYER_SERVICE_TESTNET: "https://relayer-testnet.onrender.com",
 } as const;
 
-export const INTENT_EXECUTOR: Address =
-  "0x3E1bF561DEbE46C22cc1e85EC8283A5EB49f5dae";
-
-// keccak256(abi.encode("SAME_CHAIN"));
-export const SAME_CHAIN_ORDER_DATA_TYPE: Hex =
-  "0xcb571c492be65e1ab6b3b279b36ac8d22472959a6c27d22460477e26bd32776a";
+// keccak256("SameChainOrder(bytes initData,bytes paymentData,bytes executionData)");
+export const V2_SAME_CHAIN_ORDER_DATA_TYPE: Hex =
+  "0x26c2053b2f46f1958f924d60dfe8bfc3259ddadd9241afcc55ed0c85edafcd42";
 
 export const IntentVersionToAddressesMap: {
   [key in INTENT_VERSION_TYPE]: {
@@ -26,7 +23,7 @@ export const IntentVersionToAddressesMap: {
     intentExecutorAddress: "0x3E1bF561DEbE46C22cc1e85EC8283A5EB49f5dae",
   },
   "0.0.2": {
-    intentExecutorAddress: "0xAd8da92Dd670871bD3f90475d6763d520728881a",
+    intentExecutorAddress: "0xEBbB868402b94595262EB53799A927107f82e3A2",
   },
 };
 

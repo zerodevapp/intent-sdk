@@ -1,11 +1,16 @@
 import { describe, expect, test } from "bun:test";
+import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator";
 import { createKernelAccount } from "@zerodev/sdk";
 import { getEntryPoint } from "@zerodev/sdk/constants";
-import { sepolia } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
-import { getIntentClient, getTestingChain, getPublicClient, kernelVersion } from "./utils.js";
-import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator";
+import { sepolia } from "viem/chains";
 import * as allChains from "viem/chains";
+import {
+  getIntentClient,
+  getPublicClient,
+  getTestingChain,
+  kernelVersion,
+} from "./utils.js";
 
 describe("getCAB", () => {
   test("should get balances using connected account", async () => {
@@ -54,7 +59,9 @@ describe("getCAB", () => {
 
   test("should get balances using specific account", async () => {
     const publicClient = getPublicClient();
-    const signer = privateKeyToAccount("0x1234567890123456789012345678901234567890123456789012345678901234");
+    const signer = privateKeyToAccount(
+      "0x1234567890123456789012345678901234567890123456789012345678901234",
+    );
     const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
       signer,
       kernelVersion,

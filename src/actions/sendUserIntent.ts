@@ -12,7 +12,7 @@ import {
 import type { SmartAccount } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
-import { SAME_CHAIN_ORDER_DATA_TYPE } from "../config/constants.js";
+import { V2_SAME_CHAIN_ORDER_DATA_TYPE } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import type {
   GaslessCrossChainOrder,
@@ -36,7 +36,7 @@ export type SendUserIntentResult = {
 export const getOrderHash = (order: GaslessCrossChainOrder): Hex => {
   if (
     order.orderDataType.toLowerCase() ===
-    SAME_CHAIN_ORDER_DATA_TYPE.toLowerCase()
+    V2_SAME_CHAIN_ORDER_DATA_TYPE.toLowerCase()
   ) {
     return keccak256(
       encodeAbiParameters(
