@@ -156,8 +156,11 @@ export function createIntentClient(
     paymaster,
     paymasterContext,
     bundlerTransport,
+    chain,
     intentTransport = http(ZERODEV_URLS.INTENT_SERVICE),
-    relayerTransport = http(ZERODEV_URLS.RELAYER_SERVICE_MAINNET),
+    relayerTransport = chain?.testnet
+      ? http(ZERODEV_URLS.RELAYER_SERVICE_TESTNET)
+      : http(ZERODEV_URLS.RELAYER_SERVICE_MAINNET),
     userOperation,
     version,
   } = parameters;

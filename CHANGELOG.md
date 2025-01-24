@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.14
+
+### Patch Changes
+
+- fix: use testnet relayer url
+
 ## 0.0.13
 
 ### Patch Changes
