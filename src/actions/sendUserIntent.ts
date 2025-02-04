@@ -104,27 +104,33 @@ export async function sendUserIntent<
     ));
 
   // Get the order hash
-  const orderHash = getOrderHash(intent.order);
+  if (intent.orders.length === 0) throw new Error("No orders found");
 
-  // Sign the order hash
-  if (!client.account) throw new Error("Account not found");
-  const signature = await account.signMessage({
-    message: { raw: orderHash },
-    useReplayableSignature: true,
-  });
-  const { signature: signature_ } = parseErc6492Signature(signature);
+  const uiHashes = await Promise.all(
+    intent.orders.map(async (order) => {
+      const orderHash = getOrderHash(order);
 
-  // Send the signed order to the relayer
-  const result = await client.request({
-    method: "rl_sendUserIntent",
-    params: [
-      {
-        order: intent.order,
-        signature: signature_,
-        version,
-      },
-    ],
-  });
+      // Sign the order hash
+      if (!client.account) throw new Error("Account not found");
+      const signature = await account.signMessage({
+        message: { raw: orderHash },
+        useReplayableSignature: true,
+      });
+      const { signature: signature_ } = parseErc6492Signature(signature);
 
-  return result as SendUserIntentResult;
+      // Send the signed order to the relayer
+      return await client.request({
+        method: "rl_sendUserIntent",
+        params: [
+          {
+            order: order,
+            signature: signature_,
+            version,
+          },
+        ],
+      });
+    }),
+  );
+
+  return uiHashes[0] as SendUserIntentResult;
 }
