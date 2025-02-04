@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.15
+
+### Patch Changes
+
+- feat: multi-input tokens
+
 ## 0.0.14
 
 ### Patch Changes
