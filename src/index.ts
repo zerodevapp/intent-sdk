@@ -42,6 +42,7 @@ export type {
 export {
   INTENT_V0_1,
   INTENT_V0_2,
+  INTENT_V0_3,
   IntentVersionToAddressesMap,
 } from "./config/constants.js";
 export {
