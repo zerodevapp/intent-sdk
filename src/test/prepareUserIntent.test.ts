@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { parseUnits, zeroAddress } from "viem";
-import { arbitrum, base, baseSepolia, optimism, sepolia } from "viem/chains";
+import { optimism } from "viem/chains";
 import { getIntentClient } from "./utils.js";
 
 describe("prepareUserIntent", () => {
@@ -31,7 +31,6 @@ describe("prepareUserIntent", () => {
           amount: parseUnits("0.6", 6),
         },
       ],
-      gasTokens: "CAB",
       // [
       //   {
       //     chainId: base.id,
@@ -44,8 +43,8 @@ describe("prepareUserIntent", () => {
     console.log(intent);
 
     expect(intent).toBeDefined();
-    expect(intent.order.orderData).toBeDefined();
-    expect(intent.order.orderDataType).toBeDefined();
+    expect(intent.orders[0].orderData).toBeDefined();
+    expect(intent.orders[0].orderDataType).toBeDefined();
     // expect(BigInt(intent.order.originChainId)).toBe(BigInt(sepolia.id));
   }, 1000000);
 });

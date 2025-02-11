@@ -25,7 +25,8 @@ export type GetIntentParameters = {
         amount?: bigint;
         chainId: number;
       }>
-    | "CAB";
+    | "SPONSORED"
+    | "NATIVE";
   chainId?: number;
 };
 

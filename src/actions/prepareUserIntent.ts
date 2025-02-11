@@ -43,7 +43,8 @@ export type PrepareUserIntentParameters<
         amount?: bigint;
         chainId: number;
       }>
-    | "CAB";
+    | "SPONSORED"
+    | "NATIVE";
   chainId?: number;
 };
 
