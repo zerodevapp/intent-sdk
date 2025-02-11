@@ -1,6 +1,6 @@
 {
   "name": "@zerodev/intent",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "type": "module",
   "main": "./_cjs/index.js",
   "module": "./_esm/index.js",

@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.18
+
+### Patch Changes
+
+- fix: use gasToken
+
 ## 0.0.17
 
 ### Patch Changes
