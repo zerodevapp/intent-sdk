@@ -36,14 +36,7 @@ export type EstimateUserIntentFeesParameters<
     amount: bigint;
     chainId: number;
   }>;
-  gasTokens?:
-    | Array<{
-        address: Hex;
-        amount?: bigint;
-        chainId: number;
-      }>
-    | "SPONSORED"
-    | "NATIVE";
+  gasToken?: "SPONSORED" | "NATIVE";
   chainId?: number;
 };
 
@@ -128,7 +121,7 @@ export async function estimateUserIntentFees<
   ) as SmartAccount<KernelSmartAccountImplementation>;
 
   // Convert the user intent parameters to getIntent parameters
-  const { inputTokens, outputTokens, chainId, gasTokens } = parameters;
+  const { inputTokens, outputTokens, chainId, gasToken } = parameters;
 
   // Get callData from either direct callData or encoded calls
   const callData = await (async () => {
@@ -160,7 +153,7 @@ export async function estimateUserIntentFees<
     callData,
     inputTokens: inputTokens ?? [],
     outputTokens: outputTokens ?? [],
-    gasTokens,
+    gasTokens: gasToken,
     chainId,
     initData,
     version,

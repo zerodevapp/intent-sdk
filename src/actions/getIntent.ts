@@ -19,14 +19,7 @@ export type GetIntentParameters = {
   }>;
   initData?: Hex | undefined;
   // same-chain
-  gasTokens?:
-    | Array<{
-        address: Hex;
-        amount?: bigint;
-        chainId: number;
-      }>
-    | "SPONSORED"
-    | "NATIVE";
+  gasToken?: "SPONSORED" | "NATIVE";
   chainId?: number;
 };
 
@@ -89,8 +82,10 @@ export async function getIntent<
   parameters: GetIntentParameters,
   version: INTENT_VERSION_TYPE,
 ): Promise<GetIntentReturnType> {
+  const { gasToken, ...rest } = parameters;
   const parametersWithVersion = {
-    ...parameters,
+    ...rest,
+    gasTokens: gasToken,
     version,
   };
   const intent = (await client.request({
