@@ -36,11 +36,14 @@ export type EstimateUserIntentFeesParameters<
     amount: bigint;
     chainId: number;
   }>;
-  gasTokens?: Array<{
-    address: Hex;
-    amount?: bigint;
-    chainId: number;
-  }>;
+  gasTokens?:
+    | Array<{
+        address: Hex;
+        amount?: bigint;
+        chainId: number;
+      }>
+    | "SPONSORED"
+    | "NATIVE";
   chainId?: number;
 };
 
