@@ -1,5 +1,17 @@
 # @zerodev/intent
 
+## 0.0.17
+
+### Patch Changes
+
+- fix: gasTokens usage
+
+  - gasTokens could be either NATIVE or SPONSORED
+
+  - add 'gasTokens' to estimateUserIntentFees
+
+  - change sendUserIntent to gather signatures and send them in one call
+
 ## 0.0.16
 
 ### Patch Changes
