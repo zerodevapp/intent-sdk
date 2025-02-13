@@ -22,7 +22,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { createIntentClient } from "../client/intentClient.js";
 import type { IntentClient } from "../client/intentClient.js";
-import { INTENT_V0_1 } from "../config/constants.js";
+import { INTENT_V0_3 } from "../config/constants.js";
 
 export const TEST_PRIVATE_KEY = process.env.PRIVATE_KEY as Hex;
 export const SEPOLIA_PROJECT_ID = process.env.SEPOLIA_PROJECT_ID;
@@ -94,7 +94,7 @@ export async function getIntentClient(
       transport: http(PAYMASTER_RPC, { timeout }),
     }),
     client: publicClient,
-    version: INTENT_V0_1,
+    version: INTENT_V0_3,
     // intentTransport: http(INTENT_SERVICE_RPC),
     // relayerTransport: http(RELAYER_SERVICE_RPC),
   });
