@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.20
+
+### Patch Changes
+
+- fix: update openReceipt type
+
 ## 0.0.19
 
 ### Patch Changes
