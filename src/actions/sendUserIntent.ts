@@ -26,7 +26,7 @@ import type { SmartAccount } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import { V2_SAME_CHAIN_ORDER_DATA_TYPE } from "../config/constants.js";
-import type { INTENT_VERSION_TYPE } from "../types/intent.js";
+import type { INTENT_VERSION_TYPE, UserIntentHash } from "../types/intent.js";
 import type {
   GaslessCrossChainOrder,
   GetIntentReturnType,
@@ -42,8 +42,13 @@ export type SendUserIntentParameters<
   intent?: GetIntentReturnType;
 };
 
-export type SendUserIntentResult = {
+export type RelayerSendUserIntentResult = {
   uiHash: Hex;
+};
+
+export type SendUserIntentResult = {
+  inputsUiHash: UserIntentHash[];
+  outputUiHash: UserIntentHash;
 };
 
 export const getOrderHash = (order: GaslessCrossChainOrder): Hex => {
@@ -220,5 +225,12 @@ export async function sendUserIntent<
     }),
   );
 
-  return uiHashes[0] as SendUserIntentResult;
+  return {
+    inputsUiHash: uiHashes.map((hash) => ({
+      uiHash: hash.uiHash,
+    })),
+    outputUiHash: {
+      uiHash: uiHashes[0].uiHash,
+    },
+  } as SendUserIntentResult;
 }
