@@ -1,5 +1,15 @@
 # @zerodev/intent
 
+## 0.0.19
+
+### Patch Changes
+
+- feat: multi-chain validator
+
+  - sign once when account's root validator is multi-chain validator
+
+  - return inputs/output uiHash
+
 ## 0.0.18
 
 ### Patch Changes
