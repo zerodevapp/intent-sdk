@@ -4,7 +4,10 @@ import {
   type KernelSmartAccountImplementation,
   eip712WrapHash,
 } from "@zerodev/sdk";
-import { VALIDATOR_TYPE } from "@zerodev/sdk/constants";
+import {
+  MAGIC_VALUE_SIG_REPLAYABLE,
+  VALIDATOR_TYPE,
+} from "@zerodev/sdk/constants";
 import { MerkleTree } from "merkletreejs";
 import {
   type Chain,
@@ -103,7 +106,7 @@ const signOrders = async (
             version: account.kernelVersion,
             verifyingContract: account.address,
           },
-          false, // not replayable
+          true, // replayable
         );
         return wrappedMessageHash;
       }),
@@ -131,6 +134,7 @@ const signOrders = async (
     const signatures = orderHashes.map((orderHash) => {
       const signature = concatHex([
         VALIDATOR_TYPE.SUDO,
+        MAGIC_VALUE_SIG_REPLAYABLE,
         encodeMerkleDataWithSig(orderHash),
       ]); // sudo
       const { signature: signature_ } = parseErc6492Signature(signature);
