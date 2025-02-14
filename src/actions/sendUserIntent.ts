@@ -1,8 +1,21 @@
+import { MULTI_CHAIN_ECDSA_VALIDATOR_ADDRESS } from "@zerodev/multi-chain-ecdsa-validator";
 import {
   AccountNotFoundError,
   type KernelSmartAccountImplementation,
+  eip712WrapHash,
 } from "@zerodev/sdk";
-import type { Chain, Client, Hex, Transport } from "viem";
+import { VALIDATOR_TYPE } from "@zerodev/sdk/constants";
+import { MerkleTree } from "merkletreejs";
+import {
+  type Chain,
+  type Client,
+  type Hex,
+  type Transport,
+  concatHex,
+  hashMessage,
+  isAddressEqual,
+  slice,
+} from "viem";
 import {
   encodeAbiParameters,
   keccak256,
@@ -13,7 +26,7 @@ import type { SmartAccount } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import { V2_SAME_CHAIN_ORDER_DATA_TYPE } from "../config/constants.js";
-import type { INTENT_VERSION_TYPE } from "../types/intent.js";
+import type { INTENT_VERSION_TYPE, UserIntentHash } from "../types/intent.js";
 import type {
   GaslessCrossChainOrder,
   GetIntentReturnType,
@@ -29,8 +42,13 @@ export type SendUserIntentParameters<
   intent?: GetIntentReturnType;
 };
 
-export type SendUserIntentResult = {
+export type RelayerSendUserIntentResult = {
   uiHash: Hex;
+};
+
+export type SendUserIntentResult = {
+  inputsUiHash: UserIntentHash[];
+  outputUiHash: UserIntentHash;
 };
 
 export const getOrderHash = (order: GaslessCrossChainOrder): Hex => {
@@ -65,6 +83,82 @@ export const getOrderHash = (order: GaslessCrossChainOrder): Hex => {
         keccak256(order.orderData),
       ],
     ),
+  );
+};
+
+const signOrders = async (
+  orders: GaslessCrossChainOrder[],
+  account: SmartAccount<KernelSmartAccountImplementation>,
+) => {
+  const signOrderMultichain = async (orders: GaslessCrossChainOrder[]) => {
+    const orderHashes = await Promise.all(
+      orders.map(async (order) => {
+        const orderHash = hashMessage({ raw: getOrderHash(order) });
+
+        const wrappedMessageHash = await eip712WrapHash(
+          orderHash,
+          {
+            name: "Kernel",
+            chainId: BigInt(order.originChainId),
+            version: account.kernelVersion,
+            verifyingContract: account.address,
+          },
+          false, // not replayable
+        );
+        console.log("wrappedMessageHash", wrappedMessageHash);
+        return wrappedMessageHash;
+      }),
+    );
+    const merkleTree = new MerkleTree(orderHashes, keccak256, {
+      sortPairs: true,
+    });
+
+    const merkleRoot = merkleTree.getHexRoot() as Hex;
+    const ecdsaSig = await account.kernelPluginManager.signMessage({
+      message: {
+        raw: merkleRoot,
+      },
+    });
+
+    const encodeMerkleDataWithSig = (orderHash: Hex) => {
+      const merkleProof = merkleTree.getHexProof(orderHash) as Hex[];
+      const encodedMerkleProof = encodeAbiParameters(
+        [{ name: "proof", type: "bytes32[]" }],
+        [merkleProof],
+      );
+      return concatHex([ecdsaSig, merkleRoot, encodedMerkleProof]);
+    };
+
+    const signatures = orderHashes.map((orderHash) => {
+      const signature = concatHex([
+        VALIDATOR_TYPE.SUDO,
+        encodeMerkleDataWithSig(orderHash),
+      ]); // sudo
+      const { signature: signature_ } = parseErc6492Signature(signature);
+      return signature_;
+    });
+    return signatures;
+  };
+
+  const identifier = account.kernelPluginManager.getIdentifier();
+  const sudoValidator = slice(identifier, 1);
+
+  // multi-chain ecdsa validator
+  if (isAddressEqual(sudoValidator, MULTI_CHAIN_ECDSA_VALIDATOR_ADDRESS)) {
+    return signOrderMultichain(orders);
+  }
+
+  // other validators
+  return await Promise.all(
+    orders.map(async (order) => {
+      const orderHash = getOrderHash(order);
+      const signature = await account.signMessage({
+        message: { raw: orderHash },
+        useReplayableSignature: true,
+      });
+      const { signature: signature_ } = parseErc6492Signature(signature);
+      return signature_;
+    }),
   );
 };
 
@@ -107,22 +201,13 @@ export async function sendUserIntent<
   if (intent.orders.length === 0) throw new Error("No orders found");
 
   // Sign the orders
-  const ordersWithSig = await Promise.all(
-    intent.orders.map(async (order) => {
-      const orderHash = getOrderHash(order);
-      // Sign the order hash
-      if (!client.account) throw new Error("Account not found");
-      const signature = await account.signMessage({
-        message: { raw: orderHash },
-        useReplayableSignature: true,
-      });
-      const { signature: signature_ } = parseErc6492Signature(signature);
-      return {
-        order,
-        signature: signature_,
-      };
-    }),
-  );
+  const signatures = await signOrders(intent.orders, account);
+
+  // Add the signatures to the orders
+  const ordersWithSig = intent.orders.map((order, index) => ({
+    order,
+    signature: signatures[index],
+  }));
 
   // Send the signed orders to the relayer
   const uiHashes = await Promise.all(
@@ -140,5 +225,12 @@ export async function sendUserIntent<
     }),
   );
 
-  return uiHashes[0] as SendUserIntentResult;
+  return {
+    inputsUiHash: uiHashes.map((hash) => ({
+      uiHash: hash.uiHash,
+    })),
+    outputUiHash: {
+      uiHash: uiHashes[0].uiHash,
+    },
+  } as SendUserIntentResult;
 }

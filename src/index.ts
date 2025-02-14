@@ -40,7 +40,6 @@ export type {
 } from "./actions/getCAB.js";
 
 export {
-  INTENT_V0_1,
   INTENT_V0_2,
   INTENT_V0_3,
   IntentVersionToAddressesMap,
