@@ -19,9 +19,10 @@ export type {
   Transaction,
 } from "./actions/getUserIntentStatus.js";
 export type {
-  GetUserIntentReceiptParameters,
-  GetUserIntentReceiptResult,
-  IntentReceipt,
+  GetUserIntentExecutionReceiptResult,
+  GetUserIntentOpenReceiptResult,
+  IntentExecutionReceipt,
+  IntentOpenReceipt,
 } from "./actions/types.js";
 export type {
   WaitForUserIntentExecutionReceiptParameters,

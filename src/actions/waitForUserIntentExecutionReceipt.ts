@@ -6,7 +6,7 @@ import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import { observe } from "../utils/observe.js";
 import { poll } from "../utils/poll.js";
 import { getUserIntentExecutionReceipt } from "./getUserIntentExecutionReceipt.js";
-import type { IntentReceipt } from "./types.js";
+import type { IntentExecutionReceipt } from "./types.js";
 
 export type WaitForUserIntentExecutionReceiptTimeoutErrorType =
   WaitForUserIntentExecutionReceiptTimeoutError & {
@@ -35,7 +35,8 @@ export type WaitForUserIntentExecutionReceiptParameters = {
   timeout?: number;
 };
 
-export type WaitForUserIntentExecutionReceiptReturnType = IntentReceipt;
+export type WaitForUserIntentExecutionReceiptReturnType =
+  IntentExecutionReceipt;
 
 /**
  * Waits for a User Intent execution receipt to be ready.

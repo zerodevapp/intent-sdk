@@ -35,8 +35,9 @@ import {
   sendUserIntent,
 } from "../../actions/sendUserIntent.js";
 import type {
+  GetUserIntentExecutionReceiptResult,
+  GetUserIntentOpenReceiptResult,
   GetUserIntentReceiptParameters,
-  GetUserIntentReceiptResult,
 } from "../../actions/types.js";
 import {
   type WaitForUserIntentExecutionReceiptParameters,
@@ -84,10 +85,10 @@ export type IntentClientActions<
   ) => Promise<GetUserIntentStatusResult>;
   getUserIntentOpenReceipt: (
     parameters: GetUserIntentReceiptParameters,
-  ) => Promise<GetUserIntentReceiptResult>;
+  ) => Promise<GetUserIntentOpenReceiptResult>;
   getUserIntentExecutionReceipt: (
     parameters: GetUserIntentReceiptParameters,
-  ) => Promise<GetUserIntentReceiptResult>;
+  ) => Promise<GetUserIntentExecutionReceiptResult>;
   waitForUserIntentExecutionReceipt: (
     parameters: WaitForUserIntentExecutionReceiptParameters,
   ) => Promise<WaitForUserIntentExecutionReceiptReturnType>;

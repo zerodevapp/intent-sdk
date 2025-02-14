@@ -34,7 +34,10 @@ import type {
 } from "../actions/getIntent.js";
 import type { GetUserIntentStatusResult } from "../actions/getUserIntentStatus.js";
 import type { RelayerSendUserIntentResult } from "../actions/sendUserIntent.js";
-import type { GetUserIntentReceiptResult } from "../actions/types.js";
+import type {
+  GetUserIntentExecutionReceiptResult,
+  GetUserIntentOpenReceiptResult,
+} from "../actions/types.js";
 import { ZERODEV_URLS } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import {
@@ -75,12 +78,12 @@ export type RelayerRpcSchema = [
   {
     Method: "rl_getUserIntentOpenReceipt";
     Parameters: [Hex, Address];
-    ReturnType: GetUserIntentReceiptResult;
+    ReturnType: GetUserIntentOpenReceiptResult;
   },
   {
     Method: "rl_getUserIntentExecutionReceipt";
     Parameters: [Hex, Address];
-    ReturnType: GetUserIntentReceiptResult;
+    ReturnType: GetUserIntentExecutionReceiptResult;
   },
 ];
 
