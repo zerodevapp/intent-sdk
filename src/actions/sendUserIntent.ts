@@ -105,7 +105,6 @@ const signOrders = async (
           },
           false, // not replayable
         );
-        console.log("wrappedMessageHash", wrappedMessageHash);
         return wrappedMessageHash;
       }),
     );
