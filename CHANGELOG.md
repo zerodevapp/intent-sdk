@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.21
+
+### Patch Changes
+
+- fix: remove log
+
 ## 0.0.20
 
 ### Patch Changes
