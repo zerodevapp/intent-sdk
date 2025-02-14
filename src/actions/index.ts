@@ -5,8 +5,10 @@ export { getUserIntentExecutionReceipt } from "./getUserIntentExecutionReceipt.j
 export { enableIntent } from "./enableIntent.js";
 export type { GetIntentParameters, GetIntentReturnType } from "./getIntent.js";
 export type {
+  GetUserIntentExecutionReceiptResult,
+  GetUserIntentOpenReceiptResult,
   GetUserIntentReceiptParameters,
-  GetUserIntentReceiptResult,
-  IntentReceipt,
+  IntentExecutionReceipt,
+  IntentOpenReceipt,
 } from "./types.js";
 export type { EnableIntentResult } from "./enableIntent.js";

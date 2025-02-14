@@ -1,6 +1,6 @@
 import type { Hex, Log, TransactionReceipt } from "viem";
 
-export type IntentReceipt = {
+export type IntentExecutionReceipt = {
   intentHash: Hex;
   sender: Hex;
   relayer: Hex;
@@ -9,8 +9,20 @@ export type IntentReceipt = {
   receipt: TransactionReceipt;
 } | null;
 
+export type IntentOpenReceipt = {
+  intentHash: Hex;
+  sender: Hex;
+  relayer: Hex;
+  executionChainId: Hex;
+  openChainId: Hex;
+  logs: Log[];
+  receipt: TransactionReceipt;
+} | null;
+
 export type GetUserIntentReceiptParameters = {
   uiHash: Hex;
 };
 
-export type GetUserIntentReceiptResult = IntentReceipt;
+export type GetUserIntentExecutionReceiptResult = IntentExecutionReceipt;
+
+export type GetUserIntentOpenReceiptResult = IntentOpenReceipt;

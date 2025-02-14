@@ -4,8 +4,8 @@ import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import { IntentVersionToAddressesMap } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import type {
+  GetUserIntentOpenReceiptResult,
   GetUserIntentReceiptParameters,
-  GetUserIntentReceiptResult,
 } from "./types.js";
 
 /**
@@ -13,7 +13,7 @@ import type {
  *
  * @param client - Client to use
  * @param parameters - {@link GetUserIntentReceiptParameters}
- * @returns The open receipt of the user intent. {@link GetUserIntentReceiptResult}
+ * @returns The open receipt of the user intent. {@link GetUserIntentOpenReceiptResult}
  */
 export async function getUserIntentOpenReceipt<
   transport extends Transport = Transport,
@@ -23,7 +23,7 @@ export async function getUserIntentOpenReceipt<
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetUserIntentReceiptParameters,
   version: INTENT_VERSION_TYPE,
-): Promise<GetUserIntentReceiptResult> {
+): Promise<GetUserIntentOpenReceiptResult> {
   const result = await client.request({
     method: "rl_getUserIntentOpenReceipt",
     params: [
@@ -32,5 +32,5 @@ export async function getUserIntentOpenReceipt<
     ],
   });
 
-  return result as GetUserIntentReceiptResult;
+  return result as GetUserIntentOpenReceiptResult;
 }
