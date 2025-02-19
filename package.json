@@ -1,7 +1,6 @@
 {
   "name": "@zerodev/intent",
-  "version": "0.0.22",
-  "type": "module",
+  "version": "0.0.23",
   "main": "./_cjs/index.js",
   "module": "./_esm/index.js",
   "types": "./_types/index.d.ts",
@@ -11,6 +10,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "workspaces": [
+    "."
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/zerodevapp/intent-sdk.git"
@@ -33,7 +35,7 @@
     "test": "bun test",
     "test:watch": "bun test --watch",
     "changeset": "changeset",
-    "changeset:release": "bun run build && changeset publish",
+    "changeset:release": "bash remove-type.sh && bun run build && changeset publish && bash restore-type.sh && bun run format",
     "changeset:version": "changeset version && bun install --lockfile-only"
   },
   "exports": {
@@ -59,5 +61,6 @@
     "@zerodev/ecdsa-validator": "^5.4.1",
     "@zerodev/multi-chain-ecdsa-validator": "^5.4.3",
     "@zerodev/sdk": "^5.4.19"
-  }
+  },
+  "type": "module"
 }

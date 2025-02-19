@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.23
+
+### Patch Changes
+
+- fix: package type issue
+
 ## 0.0.22
 
 ### Patch Changes
