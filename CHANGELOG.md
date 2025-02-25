@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.24
+
+### Patch Changes
+
+- feat: add projectId as params to createIntentClient
+
 ## 0.0.23
 
 ### Patch Changes
