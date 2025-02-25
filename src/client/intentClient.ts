@@ -130,6 +130,7 @@ export type CreateIntentClientConfig<
   bundlerTransport: transport;
   intentTransport?: transport;
   relayerTransport?: transport;
+  projectId?: string;
   version: INTENT_VERSION_TYPE;
 };
 
@@ -160,13 +161,25 @@ export function createIntentClient(
     paymasterContext,
     bundlerTransport,
     chain,
-    intentTransport = http(ZERODEV_URLS.INTENT_SERVICE),
-    relayerTransport = chain?.testnet
-      ? http(ZERODEV_URLS.RELAYER_SERVICE_TESTNET)
-      : http(ZERODEV_URLS.RELAYER_SERVICE_MAINNET),
+    intentTransport: rawIntentTransport,
+    relayerTransport: rawRelayerTransport,
     userOperation,
     version,
+    projectId,
   } = parameters;
+  const intentTransport = rawIntentTransport
+    ? rawIntentTransport
+    : projectId
+      ? http(`${ZERODEV_URLS.INTENT_SERVICE}/${projectId}`)
+      : http(ZERODEV_URLS.INTENT_SERVICE);
+  const baseTransportUrl = chain?.testnet
+    ? ZERODEV_URLS.RELAYER_SERVICE_TESTNET
+    : ZERODEV_URLS.RELAYER_SERVICE_MAINNET;
+  const relayerTransport = rawRelayerTransport
+    ? rawRelayerTransport
+    : projectId
+      ? http(`${baseTransportUrl}/${projectId}`)
+      : http(baseTransportUrl);
 
   // Create a custom transport that routes methods to the appropriate transport
   const transport = custom({
