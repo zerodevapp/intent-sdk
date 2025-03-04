@@ -7,20 +7,15 @@ import {
     type Rpc,
     type Transaction,
     type TransactionSigner,
-    signTransactionMessageWithSigners,
     appendTransactionMessageInstructions,
-    type Address,
     getBase64EncodedWireTransaction,
-    type FullySignedTransaction,
-    type TransactionMessage,
-    partiallySignTransaction,
-    addSignersToInstruction,
     createNoopSigner,
     address,
     setTransactionMessageFeePayerSigner,
     type Base64EncodedWireTransaction,
     type SignatureBytes,
-    signature,
+    addSignersToTransactionMessage,
+    partiallySignTransactionMessageWithSigners,
 } from "@solana/kit";
 import { FEE_PAYER_URL } from "../utils/constants.js";
 
@@ -56,8 +51,13 @@ export async function signSolanaInstructions(
         // Set transaction lifetime using blockhash
         tx => setTransactionMessageLifetimeUsingBlockhash(response.value, tx),
     );
+    // explicitly add signer to the transaction aside from the fee payer
+    const txWithSigner = addSignersToTransactionMessage([solanaSigner], transactionMessage);
+
     // Sign the transaction message with the signers embedded in the transaction message
-    const signedTransaction = await signTransactionMessageWithSigners(transactionMessage);
+    // signedTransaction.signatures[feePayer.address] == '';
+    // signedTransaction.signatures[solanaSigner.address] == Real Signature
+    const signedTransaction = await partiallySignTransactionMessageWithSigners(txWithSigner);
 
     const encoded = getBase64EncodedWireTransaction(signedTransaction);
 
