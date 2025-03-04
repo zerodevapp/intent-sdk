@@ -21,11 +21,16 @@ import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import type { GetIntentReturnType } from "./getIntent.js";
 import { getIntent } from "./getIntent.js";
+import type { IInstruction } from "@solana/kit";
+import type { Rpc, SolanaRpcApi, TransactionSigner } from "@solana/kit";
 
 export type PrepareUserIntentParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
   calls extends readonly unknown[] = readonly unknown[],
+  solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
+  solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
+  instructions extends readonly IInstruction[] | undefined = readonly IInstruction[] | undefined,
 > = PrepareUserOperationParameters<account, accountOverride, calls> & {
   inputTokens?: Array<{
     address: Hex;
@@ -39,6 +44,9 @@ export type PrepareUserIntentParameters<
   }>;
   gasToken?: "SPONSORED" | "NATIVE";
   chainId?: number;
+  solanaRpc?: solanaRpc;
+  solanaSigner?: solanaSigner;
+  instructions?: instructions;
 };
 
 export type PrepareUserIntentResult = GetIntentReturnType;
@@ -98,9 +106,12 @@ export async function prepareUserIntent<
   chain extends Chain | undefined = Chain | undefined,
   accountOverride extends SmartAccount | undefined = undefined,
   calls extends readonly unknown[] = readonly unknown[],
+  solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
+  solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
+  instructions extends  IInstruction[] | undefined =  IInstruction[] | undefined,
 >(
   client: Client<Transport, chain, account, CombinedIntentRpcSchema>,
-  parameters: PrepareUserIntentParameters<account, accountOverride, calls>,
+  parameters: PrepareUserIntentParameters<account, accountOverride, calls, solanaRpc, solanaSigner, instructions>,
   version: INTENT_VERSION_TYPE,
 ): Promise<PrepareUserIntentResult> {
   const { account: account_ = client.account } = parameters;
@@ -148,6 +159,7 @@ export async function prepareUserIntent<
       gasToken,
       chainId,
       initData,
+      instructions: parameters.instructions,
     },
     version,
   );

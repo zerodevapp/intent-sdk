@@ -19,6 +19,15 @@ export type IntentOpenReceipt = {
   receipt: TransactionReceipt;
 } | null;
 
+export type IntentFillReceipt = {
+  intentHash: Hex;
+  sender: Hex;
+  relayer: Hex;
+  executionChainId: Hex;
+  logs: Log[];
+  receipt: TransactionReceipt;
+} | null;
+
 export type GetUserIntentReceiptParameters = {
   uiHash: Hex;
 };
@@ -26,3 +35,5 @@ export type GetUserIntentReceiptParameters = {
 export type GetUserIntentExecutionReceiptResult = IntentExecutionReceipt;
 
 export type GetUserIntentOpenReceiptResult = IntentOpenReceipt;
+
+export type GetUserIntentFillReceiptResult = IntentFillReceipt;

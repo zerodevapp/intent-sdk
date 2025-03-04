@@ -3,6 +3,7 @@ import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import { deepHexlify } from "../utils/deepHexlify.js";
+import type { IInstruction } from "@solana/kit";
 
 export type GetIntentParameters = {
   recipient: Hex;
@@ -21,6 +22,8 @@ export type GetIntentParameters = {
   // same-chain
   gasToken?: "SPONSORED" | "NATIVE";
   chainId?: number;
+  
+  instructions?: IInstruction[];
 };
 
 // The actual order type
@@ -33,6 +36,8 @@ export type GaslessCrossChainOrder = {
   fillDeadline: number;
   orderDataType: Hex;
   orderData: Hex;
+
+  instructions?: IInstruction[];
 };
 
 // Return type alias for the getIntent action

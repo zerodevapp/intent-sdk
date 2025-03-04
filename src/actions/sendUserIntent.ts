@@ -36,13 +36,21 @@ import type {
 } from "./getIntent.js";
 import type { PrepareUserIntentParameters } from "./prepareUserIntent.js";
 import { prepareUserIntent } from "./prepareUserIntent.js";
-
+import {type IInstruction} from "@solana/kit";
+import {type Rpc, type SolanaRpcApi} from "@solana/kit";
+import {type TransactionSigner} from "@solana/kit";
+import { SOLANA_CHAIN_ID } from "../utils/constants.js";
+import { signSolanaInstructions } from "./solanaTransactions.js";
 export type SendUserIntentParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
   calls extends readonly unknown[] = readonly unknown[],
-> = Partial<PrepareUserIntentParameters<account, accountOverride, calls>> & {
+  solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
+  solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
+  instructions extends readonly IInstruction[] | undefined = readonly IInstruction[] | undefined,
+> = Partial<PrepareUserIntentParameters<account, accountOverride, calls, solanaRpc, solanaSigner>> & {
   intent?: GetIntentReturnType;
+  instructions?: instructions;
 };
 
 export type RelayerSendUserIntentResult = {
@@ -93,9 +101,10 @@ const signOrders = async (
   orders: GaslessCrossChainOrder[],
   account: SmartAccount<KernelSmartAccountImplementation>,
 ) => {
+  // EVM signing
   const signOrderMultichain = async (orders: GaslessCrossChainOrder[]) => {
     const orderHashes = await Promise.all(
-      orders.map(async (order) => {
+      orders.filter(order => order.originChainId !== SOLANA_CHAIN_ID).map(async (order) => {
         const orderHash = hashMessage({ raw: getOrderHash(order) });
 
         const wrappedMessageHash = await eip712WrapHash(
@@ -171,17 +180,28 @@ export async function sendUserIntent<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   accountOverride extends SmartAccount | undefined = undefined,
   calls extends readonly unknown[] = readonly unknown[],
+  solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
+  solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
+  instructions extends IInstruction[] | undefined = IInstruction[] | undefined,
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
-  parameters: SendUserIntentParameters<account, accountOverride, calls>,
+  parameters: SendUserIntentParameters<account, accountOverride, calls, solanaRpc, solanaSigner, instructions>,
   version: INTENT_VERSION_TYPE,
 ): Promise<SendUserIntentResult> {
   const {
     account: account_ = client.account,
     intent: existingIntent,
+    
     ...prepareParams
   } = parameters;
   if (!account_) throw new AccountNotFoundError();
+
+  // only one of calls or instructions should be provided
+  if (prepareParams.calls && prepareParams.instructions) {
+    throw new Error(
+      "Only one of calls or instructions should be provided in sendUserIntent",
+    );
+  }
 
   const account = parseAccount(
     account_,
@@ -195,7 +215,10 @@ export async function sendUserIntent<
       prepareParams as PrepareUserIntentParameters<
         account,
         accountOverride,
-        calls
+        calls,
+        solanaRpc,
+        solanaSigner,
+        instructions
       >,
       version,
     ));
@@ -207,9 +230,9 @@ export async function sendUserIntent<
   const signatures = await signOrders(intent.orders, account);
 
   // Add the signatures to the orders
-  const ordersWithSig = intent.orders.map((order, index) => ({
+  const ordersWithSig = intent.orders.map(async (order, index) => ({
     order,
-    signature: signatures[index],
+    signature: order.originChainId === SOLANA_CHAIN_ID ? await signSolanaInstructions(parameters.solanaRpc!, order.instructions!, parameters.solanaSigner!) : signatures[index],
   }));
 
   // Send the signed orders to the relayer

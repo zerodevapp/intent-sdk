@@ -37,6 +37,7 @@ import type { RelayerSendUserIntentResult } from "../actions/sendUserIntent.js";
 import type {
   GetUserIntentExecutionReceiptResult,
   GetUserIntentOpenReceiptResult,
+  GetUserIntentFillReceiptResult
 } from "../actions/types.js";
 import { ZERODEV_URLS } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
@@ -45,6 +46,9 @@ import {
   intentClientActions,
 } from "./decorators/intent.js";
 
+import { type SolanaRpcApi } from "@solana/kit";
+import { type Rpc } from "@solana/kit";
+import { type TransactionSigner } from "@solana/kit";
 export type IntentRpcSchema = [
   {
     Method: "ui_getIntent";
@@ -85,6 +89,11 @@ export type RelayerRpcSchema = [
     Parameters: [Hex, Address];
     ReturnType: GetUserIntentExecutionReceiptResult;
   },
+  {
+    Method: "rl_getUserIntentFillReceipt";
+    Parameters: [Hex, Address];
+    ReturnType: GetUserIntentFillReceiptResult;
+  },
 ];
 
 // Combined schema for the Intent client
@@ -96,6 +105,8 @@ export type IntentClient<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   client extends Client | undefined = Client | undefined,
   rpcSchema extends RpcSchema | undefined = undefined,
+  solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
+  solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
 > = Prettify<
   Client<
     transport,
@@ -118,6 +129,8 @@ export type IntentClient<
   paymaster: BundlerClientConfig["paymaster"] | undefined;
   paymasterContext: BundlerClientConfig["paymasterContext"] | undefined;
   userOperation: BundlerClientConfig["userOperation"] | undefined;
+  solanaRpc: solanaRpc;
+  solanaSigner: solanaSigner;
 };
 
 export type CreateIntentClientConfig<
@@ -132,6 +145,9 @@ export type CreateIntentClientConfig<
   relayerTransport?: transport;
   projectId?: string;
   version: INTENT_VERSION_TYPE;
+
+  solanaSigner? : TransactionSigner;
+  solanaRpc?: Rpc<SolanaRpcApi>;
 };
 
 export function createIntentClient<
@@ -166,6 +182,8 @@ export function createIntentClient(
     userOperation,
     version,
     projectId,
+    solanaRpc,
+    solanaSigner,
   } = parameters;
   const intentTransport = rawIntentTransport
     ? rawIntentTransport
@@ -213,7 +231,7 @@ export function createIntentClient(
       name,
       type: "intentClient",
     }),
-    { client: client_, paymaster, paymasterContext, userOperation },
+    { client: client_, paymaster, paymasterContext, userOperation, solanaRpc, solanaSigner },
   );
 
   if (parameters.userOperation?.prepareUserOperation) {
