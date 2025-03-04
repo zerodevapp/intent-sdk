@@ -58,6 +58,7 @@
     "viem": "^2.21.40"
   },
   "dependencies": {
+    "@solana/kit": "^2.1.0",
     "@zerodev/ecdsa-validator": "^5.4.1",
     "@zerodev/multi-chain-ecdsa-validator": "^5.4.3",
     "@zerodev/sdk": "^5.4.19"
