@@ -108,10 +108,9 @@ export async function prepareUserIntent<
   calls extends readonly unknown[] = readonly unknown[],
   solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
   solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
-  instructions extends  IInstruction[] | undefined =  IInstruction[] | undefined,
 >(
   client: Client<Transport, chain, account, CombinedIntentRpcSchema>,
-  parameters: PrepareUserIntentParameters<account, accountOverride, calls, solanaRpc, solanaSigner, instructions>,
+  parameters: PrepareUserIntentParameters<account, accountOverride, calls, solanaRpc, solanaSigner>,
   version: INTENT_VERSION_TYPE,
 ): Promise<PrepareUserIntentResult> {
   const { account: account_ = client.account } = parameters;
@@ -159,7 +158,6 @@ export async function prepareUserIntent<
       gasToken,
       chainId,
       initData,
-      instructions: parameters.instructions,
     },
     version,
   );

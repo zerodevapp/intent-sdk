@@ -38,7 +38,7 @@ import type { PrepareUserIntentParameters } from "./prepareUserIntent.js";
 import { prepareUserIntent } from "./prepareUserIntent.js";
 import {type IInstruction} from "@solana/kit";
 import {type Rpc, type SolanaRpcApi} from "@solana/kit";
-import {type TransactionSigner} from "@solana/kit";
+import {type TransactionSigner, type Transaction, getBase64EncodedWireTransaction} from "@solana/kit";
 import { SOLANA_CHAIN_ID } from "../utils/constants.js";
 import { signSolanaInstructions } from "./solanaTransactions.js";
 export type SendUserIntentParameters<
@@ -217,8 +217,7 @@ export async function sendUserIntent<
         accountOverride,
         calls,
         solanaRpc,
-        solanaSigner,
-        instructions
+        solanaSigner
       >,
       version,
     ));
@@ -230,10 +229,16 @@ export async function sendUserIntent<
   const signatures = await signOrders(intent.orders, account);
 
   // Add the signatures to the orders
-  const ordersWithSig = intent.orders.map(async (order, index) => ({
+  const ordersWithSig = intent.orders.map((order, index) => ({
     order,
-    signature: order.originChainId === SOLANA_CHAIN_ID ? await signSolanaInstructions(parameters.solanaRpc!, order.instructions!, parameters.solanaSigner!) : signatures[index],
+    signature: signatures[index]
   }));
+
+  let solanaTx : Transaction | undefined;
+  // solana signature if instructions are provided
+  if (prepareParams.instructions) {
+    solanaTx = await signSolanaInstructions(parameters.solanaRpc!, prepareParams.instructions!, parameters.solanaSigner!);
+  }
 
   // Send the signed orders to the relayer
   const uiHashes = await Promise.all(
@@ -245,6 +250,7 @@ export async function sendUserIntent<
             order: order,
             signature,
             version,
+            solanaTx: solanaTx ? getBase64EncodedWireTransaction(solanaTx) : undefined,
           },
         ],
       });

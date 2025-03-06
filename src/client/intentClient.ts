@@ -71,7 +71,7 @@ export type IntentRpcSchema = [
 export type RelayerRpcSchema = [
   {
     Method: "rl_sendUserIntent";
-    Parameters: [{ order: GaslessCrossChainOrder; signature: Hex }];
+    Parameters: [{ order: GaslessCrossChainOrder; signature: Hex; version: INTENT_VERSION_TYPE; solanaTx: string | undefined }];
     ReturnType: RelayerSendUserIntentResult;
   },
   {
