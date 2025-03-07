@@ -51,7 +51,7 @@ import {
 } from "../../actions/waitForUserIntentOpenReceipt.js";
 import type { INTENT_VERSION_TYPE } from "../../types/intent.js";
 import type { CombinedIntentRpcSchema } from "../intentClient.js";
-
+import type { Rpc, SolanaRpcApi, TransactionSigner,  IInstruction } from "@solana/kit";
 export type IntentClientActions<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
@@ -69,8 +69,11 @@ export type IntentClientActions<
   sendUserIntent: <
     accountOverride extends SmartAccount | undefined = undefined,
     calls extends readonly unknown[] = readonly unknown[],
+    solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
+    solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
+    instructions extends  IInstruction[] | undefined =  IInstruction[] | undefined,
   >(
-    parameters: SendUserIntentParameters<account, accountOverride, calls>,
+    parameters: SendUserIntentParameters<account, accountOverride, calls, solanaRpc, solanaSigner, instructions>,
   ) => Promise<SendUserIntentResult>;
   estimateUserIntentFees: <
     accountOverride extends SmartAccount | undefined = undefined,
