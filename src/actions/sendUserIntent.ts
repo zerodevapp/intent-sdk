@@ -1,3 +1,10 @@
+import { type IInstruction } from "@solana/kit";
+import { type Rpc, type SolanaRpcApi } from "@solana/kit";
+import {
+  type Transaction,
+  type TransactionSigner,
+  getBase64EncodedWireTransaction,
+} from "@solana/kit";
 import { MULTI_CHAIN_ECDSA_VALIDATOR_ADDRESS } from "@zerodev/multi-chain-ecdsa-validator";
 import {
   AccountNotFoundError,
@@ -30,27 +37,40 @@ import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import { V2_SAME_CHAIN_ORDER_DATA_TYPE } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE, UserIntentHash } from "../types/intent.js";
+import { SOLANA_CHAIN_ID } from "../utils/constants.js";
 import type {
   GaslessCrossChainOrder,
   GetIntentReturnType,
 } from "./getIntent.js";
 import type { PrepareUserIntentParameters } from "./prepareUserIntent.js";
 import { prepareUserIntent } from "./prepareUserIntent.js";
-import {type IInstruction} from "@solana/kit";
-import {type Rpc, type SolanaRpcApi} from "@solana/kit";
-import {type TransactionSigner, type Transaction, getBase64EncodedWireTransaction} from "@solana/kit";
-import { SOLANA_CHAIN_ID } from "../utils/constants.js";
 import { signSolanaInstructions } from "./solanaTransactions.js";
 export type SendUserIntentParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
   calls extends readonly unknown[] = readonly unknown[],
-  solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
-  solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
-  instructions extends readonly IInstruction[] | undefined = readonly IInstruction[] | undefined,
-> = Partial<PrepareUserIntentParameters<account, accountOverride, calls, solanaRpc, solanaSigner>> & {
+  SolanaRpc extends Rpc<SolanaRpcApi> | undefined =
+    | Rpc<SolanaRpcApi>
+    | undefined,
+  SolanaSigner extends TransactionSigner | undefined =
+    | TransactionSigner
+    | undefined,
+  instructions extends readonly IInstruction[] | undefined =
+    | readonly IInstruction[]
+    | undefined,
+> = Partial<
+  PrepareUserIntentParameters<
+    account,
+    accountOverride,
+    calls,
+    SolanaRpc,
+    SolanaSigner
+  >
+> & {
   intent?: GetIntentReturnType;
   instructions?: instructions;
+  solanaSigner?: SolanaSigner;
+  solanaRpc?: SolanaRpc;
 };
 
 export type RelayerSendUserIntentResult = {
@@ -104,21 +124,23 @@ const signOrders = async (
   // EVM signing
   const signOrderMultichain = async (orders: GaslessCrossChainOrder[]) => {
     const orderHashes = await Promise.all(
-      orders.filter(order => order.originChainId !== SOLANA_CHAIN_ID).map(async (order) => {
-        const orderHash = hashMessage({ raw: getOrderHash(order) });
+      orders
+        .filter((order) => order.originChainId !== SOLANA_CHAIN_ID)
+        .map(async (order) => {
+          const orderHash = hashMessage({ raw: getOrderHash(order) });
 
-        const wrappedMessageHash = await eip712WrapHash(
-          orderHash,
-          {
-            name: "Kernel",
-            chainId: BigInt(order.originChainId),
-            version: account.kernelVersion,
-            verifyingContract: account.address,
-          },
-          true, // replayable
-        );
-        return wrappedMessageHash;
-      }),
+          const wrappedMessageHash = await eip712WrapHash(
+            orderHash,
+            {
+              name: "Kernel",
+              chainId: BigInt(order.originChainId),
+              version: account.kernelVersion,
+              verifyingContract: account.address,
+            },
+            true, // replayable
+          );
+          return wrappedMessageHash;
+        }),
     );
     const merkleTree = new MerkleTree(orderHashes, keccak256, {
       sortPairs: true,
@@ -180,18 +202,31 @@ export async function sendUserIntent<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   accountOverride extends SmartAccount | undefined = undefined,
   calls extends readonly unknown[] = readonly unknown[],
-  solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
-  solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
+  SolanaRpc extends Rpc<SolanaRpcApi> | undefined =
+    | Rpc<SolanaRpcApi>
+    | undefined,
+  SolanaSigner extends TransactionSigner | undefined =
+    | TransactionSigner
+    | undefined,
   instructions extends IInstruction[] | undefined = IInstruction[] | undefined,
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
-  parameters: SendUserIntentParameters<account, accountOverride, calls, solanaRpc, solanaSigner, instructions>,
+  parameters: SendUserIntentParameters<
+    account,
+    accountOverride,
+    calls,
+    SolanaRpc,
+    SolanaSigner,
+    instructions
+  >,
   version: INTENT_VERSION_TYPE,
+  solanaSigner: TransactionSigner | undefined,
+  solanaRpc: Rpc<SolanaRpcApi> | undefined,
 ): Promise<SendUserIntentResult> {
   const {
     account: account_ = client.account,
     intent: existingIntent,
-    
+
     ...prepareParams
   } = parameters;
   if (!account_) throw new AccountNotFoundError();
@@ -216,10 +251,12 @@ export async function sendUserIntent<
         account,
         accountOverride,
         calls,
-        solanaRpc,
-        solanaSigner
+        SolanaRpc,
+        SolanaSigner
       >,
       version,
+      solanaSigner,
+      solanaRpc,
     ));
 
   // Get the order hash
@@ -231,13 +268,21 @@ export async function sendUserIntent<
   // Add the signatures to the orders
   const ordersWithSig = intent.orders.map((order, index) => ({
     order,
-    signature: signatures[index]
+    signature: signatures[index],
   }));
 
-  let solanaTx : Transaction | undefined;
+  let solanaTx: Transaction | undefined;
   // solana signature if instructions are provided
   if (prepareParams.instructions) {
-    solanaTx = await signSolanaInstructions(parameters.solanaRpc!, prepareParams.instructions!, parameters.solanaSigner!);
+    if (!solanaRpc || !solanaSigner)
+      throw new Error(
+        "Solana RPC and signer are required if instructions are provided",
+      );
+    solanaTx = await signSolanaInstructions(
+      solanaRpc,
+      prepareParams.instructions,
+      solanaSigner,
+    );
   }
 
   // Send the signed orders to the relayer
@@ -250,7 +295,9 @@ export async function sendUserIntent<
             order: order,
             signature,
             version,
-            solanaTx: solanaTx ? getBase64EncodedWireTransaction(solanaTx) : undefined,
+            solanaTx: solanaTx
+              ? getBase64EncodedWireTransaction(solanaTx)
+              : undefined,
           },
         ],
       });

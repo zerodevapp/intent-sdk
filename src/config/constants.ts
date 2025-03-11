@@ -5,7 +5,7 @@ import type {
 } from "../types/intent.js";
 
 export const ZERODEV_URLS = {
-  INTENT_SERVICE: "https://intent.zerodev.app/v2/intent",
+  INTENT_SERVICE: "https://intent.zerodev.app/v3/intent",
   RELAYER_SERVICE_MAINNET: "https://relayer.zerodev.app",
   RELAYER_SERVICE_TESTNET: "https://relayer-testnet.zerodev.app",
 } as const;

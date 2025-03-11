@@ -35,8 +35,7 @@ export type WaitForUserIntentFillReceiptParameters = {
   timeout?: number;
 };
 
-export type WaitForUserIntentFillReceiptReturnType =
-  IntentFillReceipt;
+export type WaitForUserIntentFillReceiptReturnType = IntentFillReceipt;
 
 /**
  * Waits for a User Intent execution receipt to be ready.

@@ -36,8 +36,8 @@ import type { GetUserIntentStatusResult } from "../actions/getUserIntentStatus.j
 import type { RelayerSendUserIntentResult } from "../actions/sendUserIntent.js";
 import type {
   GetUserIntentExecutionReceiptResult,
+  GetUserIntentFillReceiptResult,
   GetUserIntentOpenReceiptResult,
-  GetUserIntentFillReceiptResult
 } from "../actions/types.js";
 import { ZERODEV_URLS } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
@@ -71,7 +71,14 @@ export type IntentRpcSchema = [
 export type RelayerRpcSchema = [
   {
     Method: "rl_sendUserIntent";
-    Parameters: [{ order: GaslessCrossChainOrder; signature: Hex; version: INTENT_VERSION_TYPE; solanaTx: string | undefined }];
+    Parameters: [
+      {
+        order: GaslessCrossChainOrder;
+        signature: Hex;
+        version: INTENT_VERSION_TYPE;
+        solanaTx: string | undefined;
+      },
+    ];
     ReturnType: RelayerSendUserIntentResult;
   },
   {
@@ -105,8 +112,12 @@ export type IntentClient<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   client extends Client | undefined = Client | undefined,
   rpcSchema extends RpcSchema | undefined = undefined,
-  solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
-  solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
+  solanaRpc extends Rpc<SolanaRpcApi> | undefined =
+    | Rpc<SolanaRpcApi>
+    | undefined,
+  solanaSigner extends TransactionSigner | undefined =
+    | TransactionSigner
+    | undefined,
 > = Prettify<
   Client<
     transport,
@@ -146,7 +157,7 @@ export type CreateIntentClientConfig<
   projectId?: string;
   version: INTENT_VERSION_TYPE;
 
-  solanaSigner? : TransactionSigner;
+  solanaSigner?: TransactionSigner;
   solanaRpc?: Rpc<SolanaRpcApi>;
 };
 
@@ -231,7 +242,14 @@ export function createIntentClient(
       name,
       type: "intentClient",
     }),
-    { client: client_, paymaster, paymasterContext, userOperation, solanaRpc, solanaSigner },
+    {
+      client: client_,
+      paymaster,
+      paymasterContext,
+      userOperation,
+      solanaRpc,
+      solanaSigner,
+    },
   );
 
   if (parameters.userOperation?.prepareUserOperation) {
@@ -245,11 +263,15 @@ export function createIntentClient(
           return customPrepareUserOp(client, args);
         },
       }))
-      .extend(intentClientActions(version)) as IntentClient;
+      .extend(
+        intentClientActions(version, solanaSigner, solanaRpc),
+      ) as IntentClient;
   }
 
   return client
     .extend(bundlerActions)
     .extend(kernelAccountClientActions())
-    .extend(intentClientActions(version)) as IntentClient;
+    .extend(
+      intentClientActions(version, solanaSigner, solanaRpc),
+    ) as IntentClient;
 }

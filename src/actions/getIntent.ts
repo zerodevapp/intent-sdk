@@ -1,3 +1,9 @@
+import type {
+  Address as SolanaAddress,
+  Rpc,
+  SolanaRpcApi,
+  TransactionSigner,
+} from "@solana/kit";
 import type { Chain, Client, Hex, RpcErrorType, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
@@ -5,7 +11,8 @@ import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import { deepHexlify } from "../utils/deepHexlify.js";
 
 export type GetIntentParameters = {
-  recipient: Hex;
+  sender: Hex;
+  recipient: Hex | SolanaAddress;
   callData: Hex;
   inputTokens: Array<{
     address: Hex;
@@ -13,7 +20,7 @@ export type GetIntentParameters = {
     chainId: number;
   }>;
   outputTokens: Array<{
-    address: Hex;
+    address: Hex | SolanaAddress;
     amount: bigint;
     chainId: number;
   }>;
@@ -81,6 +88,8 @@ export async function getIntent<
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetIntentParameters,
   version: INTENT_VERSION_TYPE,
+  _solanaSigner: TransactionSigner | undefined,
+  _solanaRpc: Rpc<SolanaRpcApi> | undefined,
 ): Promise<GetIntentReturnType> {
   const { gasToken, ...rest } = parameters;
   const parametersWithVersion = {
