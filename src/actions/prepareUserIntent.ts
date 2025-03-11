@@ -1,3 +1,9 @@
+import type {
+  Address as SolanaAddress,
+  Rpc,
+  SolanaRpcApi,
+  TransactionSigner,
+} from "@solana/kit";
 import {
   AccountNotFoundError,
   type KernelSmartAccountImplementation,
@@ -19,16 +25,20 @@ import type {
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
+import { SOLANA_CHAIN_ID } from "../utils/constants.js";
 import type { GetIntentReturnType } from "./getIntent.js";
 import { getIntent } from "./getIntent.js";
-import type { Rpc, SolanaRpcApi, TransactionSigner } from "@solana/kit";
 
 export type PrepareUserIntentParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
   calls extends readonly unknown[] = readonly unknown[],
-  solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
-  solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
+  solanaRpc extends Rpc<SolanaRpcApi> | undefined =
+    | Rpc<SolanaRpcApi>
+    | undefined,
+  solanaSigner extends TransactionSigner | undefined =
+    | TransactionSigner
+    | undefined,
 > = PrepareUserOperationParameters<account, accountOverride, calls> & {
   inputTokens?: Array<{
     address: Hex;
@@ -36,7 +46,7 @@ export type PrepareUserIntentParameters<
     chainId: number;
   }>;
   outputTokens?: Array<{
-    address: Hex;
+    address: Hex | SolanaAddress;
     amount: bigint;
     chainId: number;
   }>;
@@ -103,12 +113,24 @@ export async function prepareUserIntent<
   chain extends Chain | undefined = Chain | undefined,
   accountOverride extends SmartAccount | undefined = undefined,
   calls extends readonly unknown[] = readonly unknown[],
-  solanaRpc extends Rpc<SolanaRpcApi> | undefined = Rpc<SolanaRpcApi> | undefined,
-  solanaSigner extends TransactionSigner | undefined = TransactionSigner | undefined,
+  SolanaRpc extends Rpc<SolanaRpcApi> | undefined =
+    | Rpc<SolanaRpcApi>
+    | undefined,
+  SolanaSigner extends TransactionSigner | undefined =
+    | TransactionSigner
+    | undefined,
 >(
   client: Client<Transport, chain, account, CombinedIntentRpcSchema>,
-  parameters: PrepareUserIntentParameters<account, accountOverride, calls, solanaRpc, solanaSigner>,
+  parameters: PrepareUserIntentParameters<
+    account,
+    accountOverride,
+    calls,
+    SolanaRpc,
+    SolanaSigner
+  >,
   version: INTENT_VERSION_TYPE,
+  solanaSigner: TransactionSigner | undefined,
+  solanaRpc: Rpc<SolanaRpcApi> | undefined,
 ): Promise<PrepareUserIntentResult> {
   const { account: account_ = client.account } = parameters;
   if (!account_) throw new AccountNotFoundError();
@@ -143,12 +165,25 @@ export async function prepareUserIntent<
   const factoryAddress = account.factoryAddress;
   const factoryData = await account.generateInitCode();
   const initData = concatHex([factoryAddress, factoryData]);
+  const desinationChainId =
+    outputTokens?.length && outputTokens.length > 0
+      ? outputTokens[0].chainId
+      : chainId;
+  if (!desinationChainId) {
+    throw new Error("please provide either outputTokens or chainId");
+  }
+  const recipient =
+    BigInt(desinationChainId) === SOLANA_CHAIN_ID
+      ? solanaSigner?.address
+      : account.address;
+  if (!recipient) throw new Error("please provide solanaSigner");
 
   // Call getIntent with the converted parameters
   return getIntent(
     client,
     {
-      recipient: account.address,
+      sender: account.address,
+      recipient: recipient,
       callData,
       inputTokens: inputTokens ?? [],
       outputTokens: outputTokens ?? [],
@@ -157,5 +192,7 @@ export async function prepareUserIntent<
       initData,
     },
     version,
+    solanaSigner,
+    solanaRpc,
   );
 }

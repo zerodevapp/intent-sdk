@@ -1,3 +1,4 @@
+import type { TransactionSigner } from "@solana/kit";
 import { AccountNotFoundError } from "@zerodev/sdk";
 import type { Chain, Client, Hex, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
@@ -91,6 +92,7 @@ export async function getCAB<
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetCABParameters,
+  _solanaSigner: TransactionSigner | undefined,
 ): Promise<GetCABResult> {
   const { account: account_ = client.account } = parameters;
   const accountAddress = parameters.accountAddress ?? account_?.address;
