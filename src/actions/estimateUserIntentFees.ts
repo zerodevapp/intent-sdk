@@ -1,3 +1,4 @@
+import type { IInstruction } from "@solana/kit";
 import {
   AccountNotFoundError,
   type KernelSmartAccountImplementation,
@@ -21,11 +22,27 @@ import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 
+// Create a modified version of PrepareUserOperationParameters with optional calls
+type PrepareUserOperationParametersWithOptionalCalls<
+  account extends SmartAccount | undefined = SmartAccount | undefined,
+  accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
+  calls extends readonly unknown[] = readonly unknown[],
+> = Omit<
+  PrepareUserOperationParameters<account, accountOverride, calls>,
+  "calls"
+> & {
+  calls?: calls;
+};
+
 export type EstimateUserIntentFeesParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
   calls extends readonly unknown[] = readonly unknown[],
-> = PrepareUserOperationParameters<account, accountOverride, calls> & {
+> = PrepareUserOperationParametersWithOptionalCalls<
+  account,
+  accountOverride,
+  calls
+> & {
   inputTokens?: Array<{
     address: Hex;
     amount?: bigint;
@@ -36,6 +53,7 @@ export type EstimateUserIntentFeesParameters<
     amount: bigint;
     chainId: number;
   }>;
+  instructions?: IInstruction[];
   gasToken?: "SPONSORED" | "NATIVE";
   chainId?: number;
 };
@@ -116,9 +134,10 @@ export async function estimateUserIntentFees<
   const { account: account_ = client.account } = parameters;
   if (!account_) throw new AccountNotFoundError();
 
+  // calls in parameters is optional for solana
   const account = parseAccount(
     account_,
-  ) as SmartAccount<KernelSmartAccountImplementation>;
+  ) as unknown as SmartAccount<KernelSmartAccountImplementation>;
 
   // Convert the user intent parameters to getIntent parameters
   const { inputTokens, outputTokens, chainId, gasToken } = parameters;

@@ -1,10 +1,11 @@
-import { type IInstruction } from "@solana/kit";
-import { type Rpc, type SolanaRpcApi } from "@solana/kit";
 import {
+  type IInstruction,
   type Transaction,
-  type TransactionSigner,
+  type TransactionPartialSigner,
   getBase64EncodedWireTransaction,
+  getTransactionDecoder,
 } from "@solana/kit";
+import { type Rpc, type SolanaRpcApi } from "@solana/kit";
 import { MULTI_CHAIN_ECDSA_VALIDATOR_ADDRESS } from "@zerodev/multi-chain-ecdsa-validator";
 import {
   AccountNotFoundError,
@@ -24,7 +25,9 @@ import {
   concatHex,
   hashMessage,
   isAddressEqual,
+  isHex,
   slice,
+  toBytes,
 } from "viem";
 import {
   encodeAbiParameters,
@@ -44,7 +47,7 @@ import type {
 } from "./getIntent.js";
 import type { PrepareUserIntentParameters } from "./prepareUserIntent.js";
 import { prepareUserIntent } from "./prepareUserIntent.js";
-import { signSolanaInstructions } from "./solanaTransactions.js";
+
 export type SendUserIntentParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
@@ -52,8 +55,8 @@ export type SendUserIntentParameters<
   SolanaRpc extends Rpc<SolanaRpcApi> | undefined =
     | Rpc<SolanaRpcApi>
     | undefined,
-  SolanaSigner extends TransactionSigner | undefined =
-    | TransactionSigner
+  SolanaSigner extends TransactionPartialSigner | undefined =
+    | TransactionPartialSigner
     | undefined,
   instructions extends readonly IInstruction[] | undefined =
     | readonly IInstruction[]
@@ -68,7 +71,7 @@ export type SendUserIntentParameters<
   >
 > & {
   intent?: GetIntentReturnType;
-  instructions?: instructions;
+  instructions?: instructions[];
   solanaSigner?: SolanaSigner;
   solanaRpc?: SolanaRpc;
 };
@@ -205,8 +208,8 @@ export async function sendUserIntent<
   SolanaRpc extends Rpc<SolanaRpcApi> | undefined =
     | Rpc<SolanaRpcApi>
     | undefined,
-  SolanaSigner extends TransactionSigner | undefined =
-    | TransactionSigner
+  SolanaSigner extends TransactionPartialSigner | undefined =
+    | TransactionPartialSigner
     | undefined,
   instructions extends IInstruction[] | undefined = IInstruction[] | undefined,
 >(
@@ -220,7 +223,7 @@ export async function sendUserIntent<
     instructions
   >,
   version: INTENT_VERSION_TYPE,
-  solanaSigner: TransactionSigner | undefined,
+  solanaSigner: TransactionPartialSigner | undefined,
   solanaRpc: Rpc<SolanaRpcApi> | undefined,
 ): Promise<SendUserIntentResult> {
   const {
@@ -273,17 +276,32 @@ export async function sendUserIntent<
 
   let solanaTx: Transaction | undefined;
   // solana signature if instructions are provided
-  if (prepareParams.instructions) {
-    if (!solanaRpc || !solanaSigner)
-      throw new Error(
-        "Solana RPC and signer are required if instructions are provided",
-      );
-    solanaTx = await signSolanaInstructions(
-      solanaRpc,
-      prepareParams.instructions,
-      solanaSigner,
-    );
+  if (intent.executionTransaction && isHex(intent.executionTransaction)) {
+    if (!solanaSigner) throw new Error("Solana signer is required");
+    const bytesTransaction = toBytes(intent.executionTransaction);
+    const transaction = getTransactionDecoder().decode(bytesTransaction);
+    const [transactionSignatures] = await solanaSigner.signTransactions([
+      transaction,
+    ]);
+    solanaTx = {
+      ...transaction,
+      signatures: Object.freeze({
+        ...transaction.signatures,
+        ...transactionSignatures,
+      }),
+    };
   }
+  // if (prepareParams.instructions) {
+  //   if (!solanaRpc || !solanaSigner)
+  //     throw new Error(
+  //       "Solana RPC and signer are required if instructions are provided",
+  //     );
+  //   solanaTx = await signSolanaInstructions(
+  //     solanaRpc,
+  //     prepareParams.instructions,
+  //     solanaSigner,
+  //   );
+  // }
 
   // Send the signed orders to the relayer
   const uiHashes = await Promise.all(

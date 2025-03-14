@@ -32,6 +32,7 @@ import {
   getUserIntentStatus,
 } from "../../actions/getUserIntentStatus.js";
 import {
+  type PrepareUserIntentParameters,
   type PrepareUserIntentResult,
   prepareUserIntent,
 } from "../../actions/prepareUserIntent.js";
@@ -57,6 +58,7 @@ import {
 } from "../../actions/waitForUserIntentOpenReceipt.js";
 import type { INTENT_VERSION_TYPE } from "../../types/intent.js";
 import type { CombinedIntentRpcSchema } from "../intentClient.js";
+
 export type IntentClientActions<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
@@ -67,9 +69,7 @@ export type IntentClientActions<
     accountOverride extends SmartAccount | undefined = undefined,
     calls extends readonly unknown[] = readonly unknown[],
   >(
-    parameters: Parameters<
-      typeof prepareUserIntent<account, chain, accountOverride, calls>
-    >[1],
+    parameters: PrepareUserIntentParameters<account, accountOverride, calls>,
   ) => Promise<PrepareUserIntentResult>;
   sendUserIntent: <
     accountOverride extends SmartAccount | undefined = undefined,

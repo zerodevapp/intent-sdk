@@ -14,6 +14,7 @@ export type GetIntentParameters = {
   sender: Hex;
   recipient: Hex | SolanaAddress;
   callData: Hex;
+  instructionData: Hex;
   inputTokens: Array<{
     address: Hex;
     amount?: bigint;
@@ -45,6 +46,7 @@ export type GaslessCrossChainOrder = {
 // Return type alias for the getIntent action
 export type GetIntentReturnType = {
   orders: Array<GaslessCrossChainOrder>;
+  executionTransaction?: Hex | GaslessCrossChainOrder;
 };
 
 export type GetIntentErrorType = RpcErrorType;

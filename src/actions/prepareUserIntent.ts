@@ -1,8 +1,18 @@
 import type {
   Address as SolanaAddress,
+  IInstruction,
   Rpc,
   SolanaRpcApi,
   TransactionSigner,
+} from "@solana/kit";
+import {
+  appendTransactionMessageInstructions,
+  compileTransactionMessage,
+  createTransactionMessage,
+  getCompiledTransactionMessageEncoder,
+  pipe,
+  setTransactionMessageFeePayer,
+  setTransactionMessageLifetimeUsingBlockhash,
 } from "@solana/kit";
 import {
   AccountNotFoundError,
@@ -16,7 +26,7 @@ import type {
   Hex,
   Transport,
 } from "viem";
-import { concatHex, encodeFunctionData } from "viem";
+import { concatHex, encodeFunctionData, toHex } from "viem";
 import type {
   PrepareUserOperationParameters,
   SmartAccount,
@@ -29,6 +39,18 @@ import { SOLANA_CHAIN_ID } from "../utils/constants.js";
 import type { GetIntentReturnType } from "./getIntent.js";
 import { getIntent } from "./getIntent.js";
 
+// Create a modified version of PrepareUserOperationParameters with optional calls
+type PrepareUserOperationParametersWithOptionalCalls<
+  account extends SmartAccount | undefined = SmartAccount | undefined,
+  accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
+  calls extends readonly unknown[] = readonly unknown[],
+> = Omit<
+  PrepareUserOperationParameters<account, accountOverride, calls>,
+  "calls"
+> & {
+  calls?: calls;
+};
+
 export type PrepareUserIntentParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
@@ -39,7 +61,11 @@ export type PrepareUserIntentParameters<
   solanaSigner extends TransactionSigner | undefined =
     | TransactionSigner
     | undefined,
-> = PrepareUserOperationParameters<account, accountOverride, calls> & {
+> = PrepareUserOperationParametersWithOptionalCalls<
+  account,
+  accountOverride,
+  calls
+> & {
   inputTokens?: Array<{
     address: Hex;
     amount?: bigint;
@@ -50,6 +76,7 @@ export type PrepareUserIntentParameters<
     amount: bigint;
     chainId: number;
   }>;
+  instructions?: IInstruction[];
   gasToken?: "SPONSORED" | "NATIVE";
   chainId?: number;
   solanaRpc?: solanaRpc;
@@ -135,9 +162,10 @@ export async function prepareUserIntent<
   const { account: account_ = client.account } = parameters;
   if (!account_) throw new AccountNotFoundError();
 
+  // calls in parameters is optional for solana
   const account = parseAccount(
     account_,
-  ) as SmartAccount<KernelSmartAccountImplementation>;
+  ) as unknown as SmartAccount<KernelSmartAccountImplementation>;
 
   // Convert the user intent parameters to getIntent parameters
   const { inputTokens, outputTokens, chainId, gasToken } = parameters;
@@ -160,6 +188,35 @@ export async function prepareUserIntent<
         }),
       );
     return parameters.callData ?? "0x";
+  })();
+
+  // get instructionData
+  const instructionData = await (async () => {
+    const instructions = parameters.instructions;
+    if (instructions) {
+      if (!solanaSigner || !solanaRpc)
+        throw new Error("please provide solanaSigner and solanaRpc");
+      const { value: latestBlockhash } = await solanaRpc
+        .getLatestBlockhash()
+        .send();
+      const transactionMessage = pipe(
+        createTransactionMessage({ version: 0 }),
+        (message) =>
+          setTransactionMessageFeePayer(solanaSigner.address, message),
+        (message) =>
+          setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, message),
+        (message) =>
+          appendTransactionMessageInstructions(instructions, message),
+      );
+      const compiledTransactionMessage =
+        compileTransactionMessage(transactionMessage);
+      const encodedTransactionMessage =
+        getCompiledTransactionMessageEncoder().encode(
+          compiledTransactionMessage,
+        );
+      return toHex(new Uint8Array(encodedTransactionMessage));
+    }
+    return "0x";
   })();
 
   const factoryAddress = account.factoryAddress;
@@ -185,6 +242,7 @@ export async function prepareUserIntent<
       sender: account.address,
       recipient: recipient,
       callData,
+      instructionData,
       inputTokens: inputTokens ?? [],
       outputTokens: outputTokens ?? [],
       gasToken,
