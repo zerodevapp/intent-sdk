@@ -1,5 +1,4 @@
 import {
-  type IInstruction,
   type Transaction,
   type TransactionPartialSigner,
   getBase64EncodedWireTransaction,
@@ -58,9 +57,6 @@ export type SendUserIntentParameters<
   SolanaSigner extends TransactionPartialSigner | undefined =
     | TransactionPartialSigner
     | undefined,
-  instructions extends readonly IInstruction[] | undefined =
-    | readonly IInstruction[]
-    | undefined,
 > = Partial<
   PrepareUserIntentParameters<
     account,
@@ -71,7 +67,6 @@ export type SendUserIntentParameters<
   >
 > & {
   intent?: GetIntentReturnType;
-  instructions?: instructions[];
   solanaSigner?: SolanaSigner;
   solanaRpc?: SolanaRpc;
 };
@@ -211,7 +206,6 @@ export async function sendUserIntent<
   SolanaSigner extends TransactionPartialSigner | undefined =
     | TransactionPartialSigner
     | undefined,
-  instructions extends IInstruction[] | undefined = IInstruction[] | undefined,
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: SendUserIntentParameters<
@@ -219,8 +213,7 @@ export async function sendUserIntent<
     accountOverride,
     calls,
     SolanaRpc,
-    SolanaSigner,
-    instructions
+    SolanaSigner
   >,
   version: INTENT_VERSION_TYPE,
   solanaSigner: TransactionPartialSigner | undefined,
@@ -274,12 +267,13 @@ export async function sendUserIntent<
     signature: signatures[index],
   }));
 
+  // solana signature if executionTransaction is provided
   let solanaTx: Transaction | undefined;
-  // solana signature if instructions are provided
   if (intent.executionTransaction && isHex(intent.executionTransaction)) {
     if (!solanaSigner) throw new Error("Solana signer is required");
     const bytesTransaction = toBytes(intent.executionTransaction);
     const transaction = getTransactionDecoder().decode(bytesTransaction);
+
     const [transactionSignatures] = await solanaSigner.signTransactions([
       transaction,
     ]);
@@ -291,17 +285,6 @@ export async function sendUserIntent<
       }),
     };
   }
-  // if (prepareParams.instructions) {
-  //   if (!solanaRpc || !solanaSigner)
-  //     throw new Error(
-  //       "Solana RPC and signer are required if instructions are provided",
-  //     );
-  //   solanaTx = await signSolanaInstructions(
-  //     solanaRpc,
-  //     prepareParams.instructions,
-  //     solanaSigner,
-  //   );
-  // }
 
   // Send the signed orders to the relayer
   const uiHashes = await Promise.all(

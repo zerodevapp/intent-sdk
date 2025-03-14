@@ -1,9 +1,4 @@
-import type {
-  IInstruction,
-  Rpc,
-  SolanaRpcApi,
-  TransactionSigner,
-} from "@solana/kit";
+import type { Rpc, SolanaRpcApi, TransactionPartialSigner } from "@solana/kit";
 import type { Chain, Client, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import {
@@ -77,11 +72,8 @@ export type IntentClientActions<
     solanaRpc extends Rpc<SolanaRpcApi> | undefined =
       | Rpc<SolanaRpcApi>
       | undefined,
-    solanaSigner extends TransactionSigner | undefined =
-      | TransactionSigner
-      | undefined,
-    instructions extends IInstruction[] | undefined =
-      | IInstruction[]
+    solanaSigner extends TransactionPartialSigner | undefined =
+      | TransactionPartialSigner
       | undefined,
   >(
     parameters: SendUserIntentParameters<
@@ -89,8 +81,7 @@ export type IntentClientActions<
       accountOverride,
       calls,
       solanaRpc,
-      solanaSigner,
-      instructions
+      solanaSigner
     >,
   ) => Promise<SendUserIntentResult>;
   estimateUserIntentFees: <
@@ -121,7 +112,7 @@ export type IntentClientActions<
 
 export function intentClientActions(
   version: INTENT_VERSION_TYPE,
-  solanaSigner: TransactionSigner | undefined,
+  solanaSigner: TransactionPartialSigner | undefined,
   solanaRpc: Rpc<SolanaRpcApi> | undefined,
 ): <
   transport extends Transport = Transport,
