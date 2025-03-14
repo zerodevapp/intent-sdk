@@ -1,4 +1,9 @@
 import {
+  type Rpc,
+  type SolanaRpcApi,
+  type TransactionPartialSigner,
+} from "@solana/kit";
+import {
   type KernelAccountClientActions,
   type SmartAccountClientConfig,
   kernelAccountClientActions,
@@ -46,9 +51,6 @@ import {
   intentClientActions,
 } from "./decorators/intent.js";
 
-import { type SolanaRpcApi } from "@solana/kit";
-import { type Rpc } from "@solana/kit";
-import { type TransactionSigner } from "@solana/kit";
 export type IntentRpcSchema = [
   {
     Method: "ui_getIntent";
@@ -115,8 +117,8 @@ export type IntentClient<
   solanaRpc extends Rpc<SolanaRpcApi> | undefined =
     | Rpc<SolanaRpcApi>
     | undefined,
-  solanaSigner extends TransactionSigner | undefined =
-    | TransactionSigner
+  solanaSigner extends TransactionPartialSigner | undefined =
+    | TransactionPartialSigner
     | undefined,
 > = Prettify<
   Client<
@@ -157,7 +159,7 @@ export type CreateIntentClientConfig<
   projectId?: string;
   version: INTENT_VERSION_TYPE;
 
-  solanaSigner?: TransactionSigner;
+  solanaSigner?: TransactionPartialSigner;
   solanaRpc?: Rpc<SolanaRpcApi>;
 };
 

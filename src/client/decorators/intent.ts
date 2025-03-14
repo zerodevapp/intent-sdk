@@ -1,9 +1,4 @@
-import type {
-  IInstruction,
-  Rpc,
-  SolanaRpcApi,
-  TransactionSigner,
-} from "@solana/kit";
+import type { Rpc, SolanaRpcApi, TransactionPartialSigner } from "@solana/kit";
 import type { Chain, Client, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import {
@@ -32,6 +27,7 @@ import {
   getUserIntentStatus,
 } from "../../actions/getUserIntentStatus.js";
 import {
+  type PrepareUserIntentParameters,
   type PrepareUserIntentResult,
   prepareUserIntent,
 } from "../../actions/prepareUserIntent.js";
@@ -57,6 +53,7 @@ import {
 } from "../../actions/waitForUserIntentOpenReceipt.js";
 import type { INTENT_VERSION_TYPE } from "../../types/intent.js";
 import type { CombinedIntentRpcSchema } from "../intentClient.js";
+
 export type IntentClientActions<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
@@ -67,9 +64,7 @@ export type IntentClientActions<
     accountOverride extends SmartAccount | undefined = undefined,
     calls extends readonly unknown[] = readonly unknown[],
   >(
-    parameters: Parameters<
-      typeof prepareUserIntent<account, chain, accountOverride, calls>
-    >[1],
+    parameters: PrepareUserIntentParameters<account, accountOverride, calls>,
   ) => Promise<PrepareUserIntentResult>;
   sendUserIntent: <
     accountOverride extends SmartAccount | undefined = undefined,
@@ -77,11 +72,8 @@ export type IntentClientActions<
     solanaRpc extends Rpc<SolanaRpcApi> | undefined =
       | Rpc<SolanaRpcApi>
       | undefined,
-    solanaSigner extends TransactionSigner | undefined =
-      | TransactionSigner
-      | undefined,
-    instructions extends IInstruction[] | undefined =
-      | IInstruction[]
+    solanaSigner extends TransactionPartialSigner | undefined =
+      | TransactionPartialSigner
       | undefined,
   >(
     parameters: SendUserIntentParameters<
@@ -89,8 +81,7 @@ export type IntentClientActions<
       accountOverride,
       calls,
       solanaRpc,
-      solanaSigner,
-      instructions
+      solanaSigner
     >,
   ) => Promise<SendUserIntentResult>;
   estimateUserIntentFees: <
@@ -121,7 +112,7 @@ export type IntentClientActions<
 
 export function intentClientActions(
   version: INTENT_VERSION_TYPE,
-  solanaSigner: TransactionSigner | undefined,
+  solanaSigner: TransactionPartialSigner | undefined,
   solanaRpc: Rpc<SolanaRpcApi> | undefined,
 ): <
   transport extends Transport = Transport,
