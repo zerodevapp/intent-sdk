@@ -1,6 +1,12 @@
-import type { TransactionSigner } from "@solana/kit";
+import type { Address as SolanaAddress, TransactionSigner } from "@solana/kit";
 import { AccountNotFoundError } from "@zerodev/sdk";
-import type { Chain, Client, Hex, Transport } from "viem";
+import type {
+  Address as EvmAddress,
+  Chain,
+  Client,
+  Hex,
+  Transport,
+} from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 
@@ -21,7 +27,8 @@ export type TokenBalance = {
 
 type BaseCABParameters = {
   account?: SmartAccount;
-  accountAddress?: Hex;
+  evmAddress?: EvmAddress;
+  solanaAddress?: SolanaAddress;
   tokenTickers?: string[];
 };
 
@@ -92,15 +99,16 @@ export async function getCAB<
 >(
   client: Client<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetCABParameters,
-  _solanaSigner: TransactionSigner | undefined,
+  solanaSigner: TransactionSigner | undefined,
 ): Promise<GetCABResult> {
   const { account: account_ = client.account } = parameters;
-  const accountAddress = parameters.accountAddress ?? account_?.address;
-  if (!accountAddress) throw new AccountNotFoundError();
+  const evmAddress = parameters.evmAddress ?? account_?.address;
+  const solanaAddress = parameters.solanaAddress ?? solanaSigner?.address;
+  if (!evmAddress && !solanaAddress) throw new AccountNotFoundError();
 
   const result = await client.request({
     method: "ui_getCAB",
-    params: [{ ...parameters, accountAddress }],
+    params: [{ ...parameters, evmAddress, solanaAddress }],
   });
 
   return result as GetCABResult;
