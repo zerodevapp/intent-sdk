@@ -296,7 +296,7 @@ export async function sendUserIntent<
             order: order,
             signature,
             version,
-            solanaTx: solanaTx
+            solanaTransaction: solanaTx
               ? getBase64EncodedWireTransaction(solanaTx)
               : undefined,
           },

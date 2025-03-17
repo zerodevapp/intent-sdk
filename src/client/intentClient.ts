@@ -78,7 +78,7 @@ export type RelayerRpcSchema = [
         order: GaslessCrossChainOrder;
         signature: Hex;
         version: INTENT_VERSION_TYPE;
-        solanaTx: string | undefined;
+        solanaTransaction: string | undefined;
       },
     ];
     ReturnType: RelayerSendUserIntentResult;
