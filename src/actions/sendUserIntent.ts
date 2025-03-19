@@ -194,6 +194,72 @@ const signOrders = async (
   );
 };
 
+export async function sendOrders<
+  transport extends Transport = Transport,
+  chain extends Chain | undefined = Chain | undefined,
+  account extends SmartAccount | undefined = SmartAccount | undefined,
+  SolanaRpc extends Rpc<SolanaRpcApi> | undefined =
+    | Rpc<SolanaRpcApi>
+    | undefined,
+>(
+  client: Client<transport, chain, account, CombinedIntentRpcSchema>,
+  ordersWithSig: { order: GaslessCrossChainOrder; signature: Hex }[],
+  version: INTENT_VERSION_TYPE,
+  solanaRpc: SolanaRpc,
+  solanaTx: Transaction | undefined,
+) {
+  // send orders
+  if (ordersWithSig.length > 0) {
+    const uiHashes = await Promise.all(
+      ordersWithSig.map(async ({ order, signature }, index) => {
+        return await client.request({
+          method: "rl_sendUserIntent",
+          params: [
+            {
+              order: order,
+              signature,
+              version,
+              solanaTransaction:
+                solanaTx && index === 0
+                  ? getBase64EncodedWireTransaction(solanaTx)
+                  : undefined,
+            },
+          ],
+        });
+      }),
+    );
+    return {
+      inputsUiHash: uiHashes.map((hash) => ({
+        uiHash: hash.uiHash,
+      })),
+      outputUiHash: {
+        uiHash: uiHashes[0].uiHash,
+      },
+    };
+  }
+
+  // send solana transaction
+  if (!solanaTx) throw new Error("Solana transaction is missing");
+  if (!solanaRpc) throw new Error("Solana RPC is required");
+  const transactionSignature = await solanaRpc
+    .sendTransaction(getBase64EncodedWireTransaction(solanaTx), {
+      preflightCommitment: "confirmed",
+      encoding: "base64",
+    })
+    .send();
+
+  return {
+    inputsUiHash: [
+      {
+        uiHash: transactionSignature,
+      },
+    ],
+    outputUiHash: {
+      uiHash: transactionSignature,
+    },
+  };
+}
+
 export async function sendUserIntent<
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
@@ -256,7 +322,8 @@ export async function sendUserIntent<
     ));
 
   // Get the order hash
-  if (intent.orders.length === 0) throw new Error("No orders found");
+  if (intent.orders.length === 0 && !intent.executionTransaction)
+    throw new Error("No orders found");
 
   // Sign the orders
   const signatures = await signOrders(intent.orders, account);
@@ -287,30 +354,16 @@ export async function sendUserIntent<
   }
 
   // Send the signed orders to the relayer
-  const uiHashes = await Promise.all(
-    ordersWithSig.map(async ({ order, signature }) => {
-      return await client.request({
-        method: "rl_sendUserIntent",
-        params: [
-          {
-            order: order,
-            signature,
-            version,
-            solanaTransaction: solanaTx
-              ? getBase64EncodedWireTransaction(solanaTx)
-              : undefined,
-          },
-        ],
-      });
-    }),
+  const { inputsUiHash, outputUiHash } = await sendOrders(
+    client,
+    ordersWithSig,
+    version,
+    solanaRpc,
+    solanaTx,
   );
 
   return {
-    inputsUiHash: uiHashes.map((hash) => ({
-      uiHash: hash.uiHash,
-    })),
-    outputUiHash: {
-      uiHash: uiHashes[0].uiHash,
-    },
+    inputsUiHash,
+    outputUiHash,
   } as SendUserIntentResult;
 }
