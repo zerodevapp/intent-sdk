@@ -1,4 +1,6 @@
+import { isSignature } from "@solana/kit";
 import type { Chain, Client, Hex, Transport } from "viem";
+import { isHash } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import { IntentVersionToAddressesMap } from "../config/constants.js";
@@ -48,6 +50,21 @@ export async function getUserIntentStatus<
   parameters: GetUserIntentStatusParameters,
   version: INTENT_VERSION_TYPE,
 ): Promise<GetUserIntentStatusResult> {
+  // return solana signature if uiHash is a signature
+  if (!isHash(parameters.uiHash) && isSignature(parameters.uiHash)) {
+    return {
+      status: "EXECUTED",
+      executionTransaction: {
+        chainId: 792703809,
+        txHash: parameters.uiHash,
+      },
+      openTransaction: {
+        chainId: 792703809,
+        txHash: parameters.uiHash,
+      },
+    };
+  }
+
   const result = await client.request({
     method: "rl_getUserIntentStatus",
     params: [

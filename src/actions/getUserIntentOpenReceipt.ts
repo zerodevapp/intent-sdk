@@ -1,3 +1,5 @@
+import { isSignature } from "@solana/kit";
+import { isHash, toHex } from "viem";
 import type { Chain, Client, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
@@ -24,6 +26,15 @@ export async function getUserIntentOpenReceipt<
   parameters: GetUserIntentReceiptParameters,
   version: INTENT_VERSION_TYPE,
 ): Promise<GetUserIntentOpenReceiptResult> {
+  // return solana signature if uiHash is a signature
+  if (!isHash(parameters.uiHash) && isSignature(parameters.uiHash)) {
+    return {
+      intentHash: parameters.uiHash,
+      openChainId: toHex(792703809n),
+      executionChainId: toHex(792703809n),
+      logs: [],
+    };
+  }
   const result = await client.request({
     method: "rl_getUserIntentOpenReceipt",
     params: [

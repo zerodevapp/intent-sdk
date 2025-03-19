@@ -1,4 +1,6 @@
+import { isSignature } from "@solana/kit";
 import type { Chain, Client, Transport } from "viem";
+import { isHash, toHex } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import { IntentVersionToAddressesMap } from "../config/constants.js";
@@ -24,6 +26,15 @@ export async function getUserIntentFillReceipt<
   parameters: GetUserIntentReceiptParameters,
   version: INTENT_VERSION_TYPE,
 ): Promise<GetUserIntentFillReceiptResult> {
+  // return solana signature if uiHash is a signature
+  if (!isHash(parameters.uiHash) && isSignature(parameters.uiHash)) {
+    return {
+      executionChainId: toHex(792703809n),
+      intentHash: parameters.uiHash,
+      logs: [],
+    };
+  }
+
   const result = await client.request({
     method: "rl_getUserIntentFillReceipt",
     params: [
