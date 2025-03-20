@@ -18,8 +18,8 @@ import type {
 } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type {
+  BaseIntentClient,
   CombinedIntentRpcSchema,
-  IntentClient,
 } from "../client/intentClient.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import { SOLANA_CHAIN_ID } from "../utils/constants.js";
@@ -124,7 +124,7 @@ export async function prepareUserIntent<
   accountOverride extends SmartAccount | undefined = undefined,
   calls extends readonly unknown[] = readonly unknown[],
 >(
-  client: IntentClient<Transport, chain, account, CombinedIntentRpcSchema>,
+  client: BaseIntentClient<Transport, chain, account, CombinedIntentRpcSchema>,
   parameters: PrepareUserIntentParameters<account, accountOverride, calls>,
   version: INTENT_VERSION_TYPE,
 ): Promise<PrepareUserIntentResult> {

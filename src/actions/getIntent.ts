@@ -2,8 +2,8 @@ import type { Address as SolanaAddress } from "@solana/kit";
 import type { Chain, Hex, RpcErrorType, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type {
+  BaseIntentClient,
   CombinedIntentRpcSchema,
-  IntentClient,
 } from "../client/intentClient.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import { deepHexlify } from "../utils/deepHexlify.js";
@@ -85,7 +85,7 @@ export async function getIntent<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: IntentClient<transport, chain, account, CombinedIntentRpcSchema>,
+  client: BaseIntentClient<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetIntentParameters,
   version: INTENT_VERSION_TYPE,
 ): Promise<GetIntentReturnType> {

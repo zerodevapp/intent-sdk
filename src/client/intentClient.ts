@@ -129,6 +129,26 @@ type IntentClientExtension = {
 };
 
 /**
+ * A base intent client, only supporting the intent client extensions
+ */
+export type BaseIntentClient<
+  transport extends Transport = Transport,
+  chain extends Chain | undefined = Chain | undefined,
+  account extends SmartAccount | undefined = SmartAccount | undefined,
+  rpcSchema extends RpcSchema | undefined = undefined,
+> = Prettify<
+  Client<
+    transport,
+    chain extends Chain ? chain : undefined,
+    account,
+    rpcSchema extends RpcSchema
+      ? [...rpcSchema, ...CombinedIntentRpcSchema]
+      : CombinedIntentRpcSchema,
+    IntentClientExtension
+  >
+>;
+
+/**
  * A fully built intent client with all the zerodev extensions applied
  */
 export type IntentClient<
@@ -256,9 +276,23 @@ export function createIntentClient<
   >,
 ): IntentClient<transport, chain, account, rpcSchema>;
 
-export function createIntentClient(
-  parameters: CreateIntentClientConfig,
-): IntentClient {
+export function createIntentClient<
+  transport extends Transport,
+  chain extends Chain | undefined = undefined,
+  account extends SmartAccount | undefined = undefined,
+  client extends Client | undefined = undefined,
+  rpcSchema extends RpcSchema | undefined = undefined,
+>(
+  parameters: CreateIntentClientConfig<
+    transport,
+    chain,
+    account,
+    client,
+    rpcSchema
+  >,
+): IntentClient<transport, chain, account, rpcSchema> {
+  type OutputType = IntentClient<transport, chain, account, rpcSchema>;
+
   const {
     client: client_,
     key = "Account",
@@ -332,31 +366,25 @@ export function createIntentClient(
           }
         : undefined,
     },
-  );
+  ) as unknown as BaseIntentClient;
 
   // If the user has a custom prepareUserOperation function, use it
   if (parameters.userOperation?.prepareUserOperation) {
     const customPrepareUserOp = parameters.userOperation.prepareUserOperation;
 
-    return (
-      client
-        .extend(bundlerActions)
-        .extend(kernelAccountClientActions())
-        .extend((client) => ({
-          prepareUserOperation: (args: PrepareUserOperationParameters) => {
-            return customPrepareUserOp(client, args);
-          },
-        }))
-        // @ts-ignore : we know that the intentClientActions will return the correct type
-        .extend(intentClientActions(version)) as IntentClient
-    );
-  }
-
-  return (
-    client
+    return client
       .extend(bundlerActions)
       .extend(kernelAccountClientActions())
-      // @ts-ignore : we know that the intentClientActions will return the correct type
-      .extend(intentClientActions(version)) as IntentClient
-  );
+      .extend((client) => ({
+        prepareUserOperation: (args: PrepareUserOperationParameters) => {
+          return customPrepareUserOp(client, args);
+        },
+      }))
+      .extend(intentClientActions(version)) as OutputType;
+  }
+
+  return client
+    .extend(bundlerActions)
+    .extend(kernelAccountClientActions())
+    .extend(intentClientActions(version)) as OutputType;
 }

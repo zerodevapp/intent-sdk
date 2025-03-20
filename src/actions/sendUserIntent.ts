@@ -30,8 +30,8 @@ import {
 import type { SmartAccount } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type {
+  BaseIntentClient,
   CombinedIntentRpcSchema,
-  IntentClient,
 } from "../client/intentClient.js";
 import { V2_SAME_CHAIN_ORDER_DATA_TYPE } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE, UserIntentHash } from "../types/intent.js";
@@ -179,7 +179,7 @@ export async function sendOrders<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: IntentClient<transport, chain, account, CombinedIntentRpcSchema>,
+  client: BaseIntentClient<transport, chain, account, CombinedIntentRpcSchema>,
   ordersWithSig: { order: GaslessCrossChainOrder; signature: Hex }[],
   version: INTENT_VERSION_TYPE,
   solanaTx: Base64EncodedWireTransaction | undefined,
@@ -241,7 +241,7 @@ export async function sendUserIntent<
   accountOverride extends SmartAccount | undefined = undefined,
   calls extends readonly unknown[] = readonly unknown[],
 >(
-  client: IntentClient<transport, chain, account, CombinedIntentRpcSchema>,
+  client: BaseIntentClient<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: SendUserIntentParameters<account, accountOverride, calls>,
   version: INTENT_VERSION_TYPE,
 ): Promise<SendUserIntentResult> {

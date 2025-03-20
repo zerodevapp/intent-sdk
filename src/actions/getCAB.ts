@@ -3,8 +3,8 @@ import { AccountNotFoundError } from "@zerodev/sdk";
 import type { Address as EvmAddress, Chain, Hex, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type {
+  BaseIntentClient,
   CombinedIntentRpcSchema,
-  IntentClient,
 } from "../client/intentClient.js";
 
 export type NetworkType = "mainnet" | "testnet";
@@ -94,7 +94,7 @@ export async function getCAB<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: IntentClient<transport, chain, account, CombinedIntentRpcSchema>,
+  client: BaseIntentClient<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetCABParameters,
 ): Promise<GetCABResult> {
   const { account: account_ = client.account } = parameters;

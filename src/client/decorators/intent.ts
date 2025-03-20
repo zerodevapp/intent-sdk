@@ -51,7 +51,10 @@ import {
   waitForUserIntentOpenReceipt,
 } from "../../actions/waitForUserIntentOpenReceipt.js";
 import type { INTENT_VERSION_TYPE } from "../../types/intent.js";
-import type { CombinedIntentRpcSchema, IntentClient } from "../intentClient.js";
+import type {
+  BaseIntentClient,
+  CombinedIntentRpcSchema,
+} from "../intentClient.js";
 
 export type IntentClientActions<
   chain extends Chain | undefined = Chain | undefined,
@@ -104,7 +107,7 @@ export function intentClientActions(
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: IntentClient<transport, chain, account, CombinedIntentRpcSchema>,
+  client: BaseIntentClient<transport, chain, account, CombinedIntentRpcSchema>,
 ) => IntentClientActions<chain, account> {
   return (client) => ({
     getIntent: (parameters) => getIntent(client, parameters, version),
