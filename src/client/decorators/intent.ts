@@ -104,13 +104,7 @@ export function intentClientActions(
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: IntentClient<
-    transport,
-    chain,
-    account,
-    undefined,
-    CombinedIntentRpcSchema
-  >,
+  client: IntentClient<transport, chain, account, CombinedIntentRpcSchema>,
 ) => IntentClientActions<chain, account> {
   return (client) => ({
     getIntent: (parameters) => getIntent(client, parameters, version),

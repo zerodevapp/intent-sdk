@@ -124,13 +124,7 @@ export async function prepareUserIntent<
   accountOverride extends SmartAccount | undefined = undefined,
   calls extends readonly unknown[] = readonly unknown[],
 >(
-  client: IntentClient<
-    Transport,
-    chain,
-    account,
-    undefined,
-    CombinedIntentRpcSchema
-  >,
+  client: IntentClient<Transport, chain, account, CombinedIntentRpcSchema>,
   parameters: PrepareUserIntentParameters<account, accountOverride, calls>,
   version: INTENT_VERSION_TYPE,
 ): Promise<PrepareUserIntentResult> {

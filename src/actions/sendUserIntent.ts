@@ -179,13 +179,7 @@ export async function sendOrders<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: IntentClient<
-    transport,
-    chain,
-    account,
-    undefined,
-    CombinedIntentRpcSchema
-  >,
+  client: IntentClient<transport, chain, account, CombinedIntentRpcSchema>,
   ordersWithSig: { order: GaslessCrossChainOrder; signature: Hex }[],
   version: INTENT_VERSION_TYPE,
   solanaTx: Base64EncodedWireTransaction | undefined,
@@ -247,13 +241,7 @@ export async function sendUserIntent<
   accountOverride extends SmartAccount | undefined = undefined,
   calls extends readonly unknown[] = readonly unknown[],
 >(
-  client: IntentClient<
-    transport,
-    chain,
-    account,
-    undefined,
-    CombinedIntentRpcSchema
-  >,
+  client: IntentClient<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: SendUserIntentParameters<account, accountOverride, calls>,
   version: INTENT_VERSION_TYPE,
 ): Promise<SendUserIntentResult> {

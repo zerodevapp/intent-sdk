@@ -85,13 +85,7 @@ export async function getIntent<
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: IntentClient<
-    transport,
-    chain,
-    account,
-    undefined,
-    CombinedIntentRpcSchema
-  >,
+  client: IntentClient<transport, chain, account, CombinedIntentRpcSchema>,
   parameters: GetIntentParameters,
   version: INTENT_VERSION_TYPE,
 ): Promise<GetIntentReturnType> {
