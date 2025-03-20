@@ -1,5 +1,4 @@
-import type { Rpc, SolanaRpcApi, TransactionPartialSigner } from "@solana/kit";
-import type { Chain, Client, Transport } from "viem";
+import type { Chain, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import {
   type EnableIntentResult,
@@ -52,7 +51,7 @@ import {
   waitForUserIntentOpenReceipt,
 } from "../../actions/waitForUserIntentOpenReceipt.js";
 import type { INTENT_VERSION_TYPE } from "../../types/intent.js";
-import type { CombinedIntentRpcSchema } from "../intentClient.js";
+import type { CombinedIntentRpcSchema, IntentClient } from "../intentClient.js";
 
 export type IntentClientActions<
   chain extends Chain | undefined = Chain | undefined,
@@ -69,20 +68,8 @@ export type IntentClientActions<
   sendUserIntent: <
     accountOverride extends SmartAccount | undefined = undefined,
     calls extends readonly unknown[] = readonly unknown[],
-    solanaRpc extends Rpc<SolanaRpcApi> | undefined =
-      | Rpc<SolanaRpcApi>
-      | undefined,
-    solanaSigner extends TransactionPartialSigner | undefined =
-      | TransactionPartialSigner
-      | undefined,
   >(
-    parameters: SendUserIntentParameters<
-      account,
-      accountOverride,
-      calls,
-      solanaRpc,
-      solanaSigner
-    >,
+    parameters: SendUserIntentParameters<account, accountOverride, calls>,
   ) => Promise<SendUserIntentResult>;
   estimateUserIntentFees: <
     accountOverride extends SmartAccount | undefined = undefined,
@@ -112,23 +99,25 @@ export type IntentClientActions<
 
 export function intentClientActions(
   version: INTENT_VERSION_TYPE,
-  solanaSigner: TransactionPartialSigner | undefined,
-  solanaRpc: Rpc<SolanaRpcApi> | undefined,
 ): <
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
 >(
-  client: Client<transport, chain, account, CombinedIntentRpcSchema>,
+  client: IntentClient<
+    transport,
+    chain,
+    account,
+    undefined,
+    CombinedIntentRpcSchema
+  >,
 ) => IntentClientActions<chain, account> {
   return (client) => ({
-    getIntent: (parameters) =>
-      getIntent(client, parameters, version, solanaSigner, solanaRpc),
-    getCAB: (parameters) => getCAB(client, parameters, solanaSigner),
+    getIntent: (parameters) => getIntent(client, parameters, version),
+    getCAB: (parameters) => getCAB(client, parameters),
     prepareUserIntent: (parameters) =>
-      prepareUserIntent(client, parameters, version, solanaSigner, solanaRpc),
-    sendUserIntent: (parameters) =>
-      sendUserIntent(client, parameters, version, solanaSigner, solanaRpc),
+      prepareUserIntent(client, parameters, version),
+    sendUserIntent: (parameters) => sendUserIntent(client, parameters, version),
     estimateUserIntentFees: (parameters) =>
       estimateUserIntentFees(client, parameters, version),
     getUserIntentStatus: (parameters) =>

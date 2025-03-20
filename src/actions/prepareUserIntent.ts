@@ -1,19 +1,4 @@
-import type {
-  Address as SolanaAddress,
-  IInstruction,
-  Rpc,
-  SolanaRpcApi,
-  TransactionSigner,
-} from "@solana/kit";
-import {
-  appendTransactionMessageInstructions,
-  compileTransactionMessage,
-  createTransactionMessage,
-  getCompiledTransactionMessageEncoder,
-  pipe,
-  setTransactionMessageFeePayer,
-  setTransactionMessageLifetimeUsingBlockhash,
-} from "@solana/kit";
+import type { Address as SolanaAddress, ReadonlyUint8Array } from "@solana/kit";
 import {
   AccountNotFoundError,
   type KernelSmartAccountImplementation,
@@ -21,7 +6,6 @@ import {
 import type {
   Address,
   Chain,
-  Client,
   ContractFunctionParameters,
   Hex,
   Transport,
@@ -33,7 +17,10 @@ import type {
   UserOperationCall,
 } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
-import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
+import type {
+  CombinedIntentRpcSchema,
+  IntentClient,
+} from "../client/intentClient.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 import { SOLANA_CHAIN_ID } from "../utils/constants.js";
 import type { GetIntentReturnType } from "./getIntent.js";
@@ -55,12 +42,6 @@ export type PrepareUserIntentParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   accountOverride extends SmartAccount | undefined = SmartAccount | undefined,
   calls extends readonly unknown[] = readonly unknown[],
-  solanaRpc extends Rpc<SolanaRpcApi> | undefined =
-    | Rpc<SolanaRpcApi>
-    | undefined,
-  solanaSigner extends TransactionSigner | undefined =
-    | TransactionSigner
-    | undefined,
 > = PrepareUserOperationParametersWithOptionalCalls<
   account,
   accountOverride,
@@ -76,11 +57,13 @@ export type PrepareUserIntentParameters<
     amount: bigint;
     chainId: number;
   }>;
-  instructions?: IInstruction[];
+  /**
+   * Prepared and encoded transactions for solana
+   * Built using : `getCompiledTransactionMessageEncoder().encode(compiledTransactionMessage)`
+   */
+  solTransaction?: ReadonlyUint8Array;
   gasToken?: "SPONSORED" | "NATIVE";
   chainId?: number;
-  solanaRpc?: solanaRpc;
-  solanaSigner?: solanaSigner;
 };
 
 export type PrepareUserIntentResult = GetIntentReturnType;
@@ -140,24 +123,16 @@ export async function prepareUserIntent<
   chain extends Chain | undefined = Chain | undefined,
   accountOverride extends SmartAccount | undefined = undefined,
   calls extends readonly unknown[] = readonly unknown[],
-  SolanaRpc extends Rpc<SolanaRpcApi> | undefined =
-    | Rpc<SolanaRpcApi>
-    | undefined,
-  SolanaSigner extends TransactionSigner | undefined =
-    | TransactionSigner
-    | undefined,
 >(
-  client: Client<Transport, chain, account, CombinedIntentRpcSchema>,
-  parameters: PrepareUserIntentParameters<
+  client: IntentClient<
+    Transport,
+    chain,
     account,
-    accountOverride,
-    calls,
-    SolanaRpc,
-    SolanaSigner
+    undefined,
+    CombinedIntentRpcSchema
   >,
+  parameters: PrepareUserIntentParameters<account, accountOverride, calls>,
   version: INTENT_VERSION_TYPE,
-  solanaSigner: TransactionSigner | undefined,
-  solanaRpc: Rpc<SolanaRpcApi> | undefined,
 ): Promise<PrepareUserIntentResult> {
   const { account: account_ = client.account } = parameters;
   if (!account_) throw new AccountNotFoundError();
@@ -192,29 +167,9 @@ export async function prepareUserIntent<
 
   // get instructionData
   const instructionData = await (async () => {
-    const instructions = parameters.instructions;
-    if (instructions) {
-      if (!solanaSigner || !solanaRpc)
-        throw new Error("please provide solanaSigner and solanaRpc");
-      const { value: latestBlockhash } = await solanaRpc
-        .getLatestBlockhash()
-        .send();
-      const transactionMessage = pipe(
-        createTransactionMessage({ version: 0 }),
-        (message) =>
-          setTransactionMessageFeePayer(solanaSigner.address, message),
-        (message) =>
-          setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, message),
-        (message) =>
-          appendTransactionMessageInstructions(instructions, message),
-      );
-      const compiledTransactionMessage =
-        compileTransactionMessage(transactionMessage);
-      const encodedTransactionMessage =
-        getCompiledTransactionMessageEncoder().encode(
-          compiledTransactionMessage,
-        );
-      return toHex(new Uint8Array(encodedTransactionMessage));
+    // If we got a provided solana transaction, return it
+    if (parameters.solTransaction) {
+      return toHex(new Uint8Array(parameters.solTransaction));
     }
     return "0x";
   })();
@@ -231,7 +186,7 @@ export async function prepareUserIntent<
   }
   const recipient =
     BigInt(desinationChainId) === SOLANA_CHAIN_ID
-      ? solanaSigner?.address
+      ? client.solana?.address
       : account.address;
   if (!recipient) throw new Error("please provide solanaSigner");
 
@@ -250,7 +205,5 @@ export async function prepareUserIntent<
       initData,
     },
     version,
-    solanaSigner,
-    solanaRpc,
   );
 }

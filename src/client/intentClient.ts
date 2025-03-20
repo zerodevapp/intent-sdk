@@ -1,7 +1,7 @@
 import {
-  type Rpc,
-  type SolanaRpcApi,
-  type TransactionPartialSigner,
+  type Address as SolanaAddress,
+  type Base64EncodedWireTransaction,
+  createSolanaRpc,
 } from "@solana/kit";
 import {
   type KernelAccountClientActions,
@@ -11,6 +11,7 @@ import {
 import {
   http,
   type Address,
+  type ByteArray,
   type Chain,
   type Client,
   type Hex,
@@ -114,12 +115,6 @@ export type IntentClient<
   account extends SmartAccount | undefined = SmartAccount | undefined,
   client extends Client | undefined = Client | undefined,
   rpcSchema extends RpcSchema | undefined = undefined,
-  solanaRpc extends Rpc<SolanaRpcApi> | undefined =
-    | Rpc<SolanaRpcApi>
-    | undefined,
-  solanaSigner extends TransactionPartialSigner | undefined =
-    | TransactionPartialSigner
-    | undefined,
 > = Prettify<
   Client<
     transport,
@@ -142,8 +137,18 @@ export type IntentClient<
   paymaster: BundlerClientConfig["paymaster"] | undefined;
   paymasterContext: BundlerClientConfig["paymasterContext"] | undefined;
   userOperation: BundlerClientConfig["userOperation"] | undefined;
-  solanaRpc: solanaRpc;
-  solanaSigner: solanaSigner;
+
+  // Solana specific stuff
+  solana?: {
+    rpc: ReturnType<typeof createSolanaRpc>;
+    address: SolanaAddress;
+    signTransaction: (
+      transaction: ByteArray,
+    ) => Promise<Base64EncodedWireTransaction>;
+    sendTransaction: (
+      transaction: Base64EncodedWireTransaction,
+    ) => Promise<string>;
+  };
 };
 
 export type CreateIntentClientConfig<
@@ -159,10 +164,79 @@ export type CreateIntentClientConfig<
   projectId?: string;
   version: INTENT_VERSION_TYPE;
 
-  solanaSigner?: TransactionPartialSigner;
-  solanaRpc?: Rpc<SolanaRpcApi>;
+  // Solana specific parameters
+  solana?: {
+    address: SolanaAddress;
+    rpcUrl: string;
+    signTransaction: (
+      transaction: ByteArray,
+    ) => Promise<Base64EncodedWireTransaction>;
+  };
 };
 
+/**
+ * Creates an ZeroDev Intent client
+ * @param parameters - The configuration for the Intent client
+ * @returns An Intent client
+ *
+ * @example
+ * ```ts
+ * // Simple intent client than can send intent across any EVM chains
+ * const client = createIntentClient({
+ *   chain: mainnet,
+ *   account: kernelAccount,
+ *   version: INTENT_V0_3,
+ *   bundlerTransport: http(bundlerRpc),
+ * });
+ *
+ * // Intent client that can send intents across any EVM / Solana chain using the @solana/kit SDK
+ * const client = createIntentClient({
+ *   account: kernelAccount,
+ *   bundlerTransport: http(bundlerRpc),
+ *   version: INTENT_V0_3,
+ *   solana: {
+ *     rpcUrl: 'https://api.mainnet-beta.solana.com',
+ *     address: solanaSigner.address,
+ *     signTransaction: async (transaction) => {
+ *       const decoded = getTransactionDecoder().decode(transaction)
+ *       const [signatures] = await solanaSigner.signTransactions([decoded])
+ *       const newTransaction = {
+ *         ...decoded,
+ *         signatures: Object.freeze({
+ *           ...decoded.signatures,
+ *           ...signatures
+ *         }),
+ *       }
+ *       return getBase64EncodedWireTransaction(newTransaction);
+ *     },
+ *   },
+ * });
+ *
+ * // Intent client that can send intents across any EVM / Solana chain using the @solana/web3js SDK
+ * // todo: Add guide around this
+ * const client = createIntentClient({
+ *   account: kernelAccount,
+ *   bundlerTransport: http(bundlerRpc),
+ *   version: INTENT_V0_3,
+ *   solana: {
+ *     rpcUrl: 'https://api.mainnet-beta.solana.com',
+ *     address: solanaSigner.address,
+ *     signTransaction: async (transaction) => {
+ *       const decoded = getTransactionDecoder().decode(transaction)
+ *       const [signatures] = await solanaSigner.signTransactions([decoded])
+ *       const newTransaction = {
+ *         ...decoded,
+ *         signatures: Object.freeze({
+ *           ...decoded.signatures,
+ *           ...signatures
+ *         }),
+ *       }
+ *       return getBase64EncodedWireTransaction(newTransaction);
+ *     },
+ *   },
+ * });
+ * ```
+ */
 export function createIntentClient<
   transport extends Transport,
   chain extends Chain | undefined = undefined,
@@ -195,8 +269,7 @@ export function createIntentClient(
     userOperation,
     version,
     projectId,
-    solanaRpc,
-    solanaSigner,
+    solana,
   } = parameters;
   const intentTransport = rawIntentTransport
     ? rawIntentTransport
@@ -249,31 +322,37 @@ export function createIntentClient(
       paymaster,
       paymasterContext,
       userOperation,
-      solanaRpc,
-      solanaSigner,
+      solana: solana
+        ? {
+            ...solana,
+            rpc: createSolanaRpc(solana.rpcUrl),
+          }
+        : undefined,
     },
-  );
+  ) as unknown as IntentClient;
 
   if (parameters.userOperation?.prepareUserOperation) {
     const customPrepareUserOp = parameters.userOperation.prepareUserOperation;
 
-    return client
-      .extend(bundlerActions)
-      .extend(kernelAccountClientActions())
-      .extend((client) => ({
-        prepareUserOperation: (args: PrepareUserOperationParameters) => {
-          return customPrepareUserOp(client, args);
-        },
-      }))
-      .extend(
-        intentClientActions(version, solanaSigner, solanaRpc),
-      ) as IntentClient;
+    return (
+      client
+        .extend(bundlerActions)
+        .extend(kernelAccountClientActions())
+        .extend((client) => ({
+          prepareUserOperation: (args: PrepareUserOperationParameters) => {
+            return customPrepareUserOp(client, args);
+          },
+        }))
+        // @ts-ignore : we know that the intentClientActions will return the correct type
+        .extend(intentClientActions(version)) as IntentClient
+    );
   }
 
-  return client
-    .extend(bundlerActions)
-    .extend(kernelAccountClientActions())
-    .extend(
-      intentClientActions(version, solanaSigner, solanaRpc),
-    ) as IntentClient;
+  return (
+    client
+      .extend(bundlerActions)
+      .extend(kernelAccountClientActions())
+      // @ts-ignore : we know that the intentClientActions will return the correct type
+      .extend(intentClientActions(version)) as IntentClient
+  );
 }
