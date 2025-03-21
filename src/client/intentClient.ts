@@ -1,7 +1,7 @@
 import {
-  type Rpc,
-  type SolanaRpcApi,
-  type TransactionPartialSigner,
+  type Address as SolanaAddress,
+  type Base64EncodedWireTransaction,
+  createSolanaRpc,
 } from "@solana/kit";
 import {
   type KernelAccountClientActions,
@@ -11,6 +11,7 @@ import {
 import {
   http,
   type Address,
+  type ByteArray,
   type Chain,
   type Client,
   type Hex,
@@ -108,44 +109,68 @@ export type RelayerRpcSchema = [
 // Combined schema for the Intent client
 export type CombinedIntentRpcSchema = [...IntentRpcSchema, ...RelayerRpcSchema];
 
-export type IntentClient<
+// The extension around a client to support zerodev intent
+type IntentClientExtension = {
+  paymaster: BundlerClientConfig["paymaster"] | undefined;
+  paymasterContext: BundlerClientConfig["paymasterContext"] | undefined;
+  userOperation: BundlerClientConfig["userOperation"] | undefined;
+
+  // Solana specific stuff
+  solana?: {
+    rpc: ReturnType<typeof createSolanaRpc>;
+    address: SolanaAddress;
+    signTransaction: (
+      transaction: ByteArray,
+    ) => Promise<Base64EncodedWireTransaction>;
+  };
+};
+
+/**
+ * A base intent client, only supporting the intent client extensions
+ */
+export type BaseIntentClient<
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
   account extends SmartAccount | undefined = SmartAccount | undefined,
-  client extends Client | undefined = Client | undefined,
   rpcSchema extends RpcSchema | undefined = undefined,
-  solanaRpc extends Rpc<SolanaRpcApi> | undefined =
-    | Rpc<SolanaRpcApi>
-    | undefined,
-  solanaSigner extends TransactionPartialSigner | undefined =
-    | TransactionPartialSigner
-    | undefined,
 > = Prettify<
   Client<
     transport,
-    chain extends Chain
-      ? chain
-      : // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-        client extends Client<any, infer chain>
-        ? chain
-        : undefined,
+    chain extends Chain ? chain : undefined,
     account,
     rpcSchema extends RpcSchema
       ? [...rpcSchema, ...CombinedIntentRpcSchema]
       : CombinedIntentRpcSchema,
-    BundlerActions<account> &
+    IntentClientExtension
+  >
+>;
+
+/**
+ * A fully built intent client with all the zerodev extensions applied
+ */
+export type IntentClient<
+  transport extends Transport = Transport,
+  chain extends Chain | undefined = Chain | undefined,
+  account extends SmartAccount | undefined = SmartAccount | undefined,
+  rpcSchema extends RpcSchema | undefined = undefined,
+> = Prettify<
+  Client<
+    transport,
+    chain extends Chain ? chain : undefined,
+    account,
+    rpcSchema extends RpcSchema
+      ? [...rpcSchema, ...CombinedIntentRpcSchema]
+      : CombinedIntentRpcSchema,
+    IntentClientExtension &
+      BundlerActions<account> &
       KernelAccountClientActions<chain, account> &
       IntentClientActions<chain, account>
   >
-> & {
-  client: client;
-  paymaster: BundlerClientConfig["paymaster"] | undefined;
-  paymasterContext: BundlerClientConfig["paymasterContext"] | undefined;
-  userOperation: BundlerClientConfig["userOperation"] | undefined;
-  solanaRpc: solanaRpc;
-  solanaSigner: solanaSigner;
-};
+>;
 
+/**
+ * The configuration for the Intent client
+ */
 export type CreateIntentClientConfig<
   transport extends Transport = Transport,
   chain extends Chain | undefined = Chain | undefined,
@@ -159,9 +184,94 @@ export type CreateIntentClientConfig<
   projectId?: string;
   version: INTENT_VERSION_TYPE;
 
-  solanaSigner?: TransactionPartialSigner;
-  solanaRpc?: Rpc<SolanaRpcApi>;
+  // Solana specific parameters
+  solana?: {
+    address: SolanaAddress;
+    rpcUrl: string;
+    signTransaction: (
+      transaction: ByteArray,
+    ) => Promise<Base64EncodedWireTransaction>;
+  };
 };
+
+/**
+ * Creates an ZeroDev Intent client
+ * @param parameters - The configuration for the Intent client
+ * @returns An Intent client
+ *
+ * @example
+ * ```ts
+ * // Simple intent client than can send intent across any EVM chains
+ * const client = createIntentClient({
+ *   chain: mainnet,
+ *   account: kernelAccount,
+ *   version: INTENT_V0_3,
+ *   bundlerTransport: http(bundlerRpc),
+ * });
+ *
+ * // Intent client that can send intents across any EVM / Solana chain using the `@solana/kit` SDK
+ * const client = createIntentClient({
+ *   account: kernelAccount,
+ *   bundlerTransport: http(bundlerRpc),
+ *   version: INTENT_V0_3,
+ *   solana: {
+ *     rpcUrl: 'https://api.mainnet-beta.solana.com',
+ *     address: solanaSigner.address,
+ *     signTransaction: async (transaction) => {
+ *       const decoded = getTransactionDecoder().decode(transaction)
+ *       const [signatures] = await solanaSigner.signTransactions([decoded])
+ *       const newTransaction = {
+ *         ...decoded,
+ *         signatures: Object.freeze({
+ *           ...decoded.signatures,
+ *           ...signatures
+ *         }),
+ *       }
+ *       return getBase64EncodedWireTransaction(newTransaction);
+ *     },
+ *   },
+ * });
+ *
+ * // Intent client that can send intents across any EVM / Solana chain using the `@solana/web3js` SDK
+ * // todo: Add guide around this
+ * const client = createIntentClient({
+ *   account: kernelAccount,
+ *   bundlerTransport: http(bundlerRpc),
+ *   version: INTENT_V0_3,
+ *   solana: {
+ *     rpcUrl: 'https://api.mainnet-beta.solana.com',
+ *     address: solanaSigner.address,
+ *     signTransaction: async (transaction) => {
+ *       const decoded = getTransactionDecoder().decode(transaction)
+ *       const [signatures] = await solanaSigner.signTransactions([decoded])
+ *       const newTransaction = {
+ *         ...decoded,
+ *         signatures: Object.freeze({
+ *           ...decoded.signatures,
+ *           ...signatures
+ *         }),
+ *       }
+ *       return getBase64EncodedWireTransaction(newTransaction);
+ *     },
+ *   },
+ * });
+ * ```
+ */
+export function createIntentClient<
+  transport extends Transport,
+  chain extends Chain | undefined = undefined,
+  account extends SmartAccount | undefined = undefined,
+  client extends Client | undefined = undefined,
+  rpcSchema extends RpcSchema | undefined = undefined,
+>(
+  parameters: CreateIntentClientConfig<
+    transport,
+    chain,
+    account,
+    client,
+    rpcSchema
+  >,
+): IntentClient<transport, chain, account, rpcSchema>;
 
 export function createIntentClient<
   transport extends Transport,
@@ -177,11 +287,9 @@ export function createIntentClient<
     client,
     rpcSchema
   >,
-): IntentClient<transport, chain, account, client, rpcSchema>;
+): IntentClient<transport, chain, account, rpcSchema> {
+  type OutputType = IntentClient<transport, chain, account, rpcSchema>;
 
-export function createIntentClient(
-  parameters: CreateIntentClientConfig,
-): IntentClient {
   const {
     client: client_,
     key = "Account",
@@ -195,8 +303,7 @@ export function createIntentClient(
     userOperation,
     version,
     projectId,
-    solanaRpc,
-    solanaSigner,
+    solana,
   } = parameters;
   const intentTransport = rawIntentTransport
     ? rawIntentTransport
@@ -235,6 +342,7 @@ export function createIntentClient(
     },
   });
 
+  // Create our base client (a viem client with the `IntentClientExtension` basically)
   const client = Object.assign(
     createClient({
       ...parameters,
@@ -245,15 +353,19 @@ export function createIntentClient(
       type: "intentClient",
     }),
     {
-      client: client_,
       paymaster,
       paymasterContext,
       userOperation,
-      solanaRpc,
-      solanaSigner,
+      solana: solana
+        ? {
+            ...solana,
+            rpc: createSolanaRpc(solana.rpcUrl),
+          }
+        : undefined,
     },
-  );
+  ) as unknown as BaseIntentClient;
 
+  // If the user has a custom prepareUserOperation function, use it
   if (parameters.userOperation?.prepareUserOperation) {
     const customPrepareUserOp = parameters.userOperation.prepareUserOperation;
 
@@ -265,15 +377,11 @@ export function createIntentClient(
           return customPrepareUserOp(client, args);
         },
       }))
-      .extend(
-        intentClientActions(version, solanaSigner, solanaRpc),
-      ) as IntentClient;
+      .extend(intentClientActions(version)) as OutputType;
   }
 
   return client
     .extend(bundlerActions)
     .extend(kernelAccountClientActions())
-    .extend(
-      intentClientActions(version, solanaSigner, solanaRpc),
-    ) as IntentClient;
+    .extend(intentClientActions(version)) as OutputType;
 }
