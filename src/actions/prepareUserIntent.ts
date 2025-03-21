@@ -117,6 +117,24 @@ export type PrepareUserIntentResult = GetIntentReturnType;
  *     chainId: 10n
  *   }]
  * })
+ * 
+ * // Using solana transaction
+ * const result = await intentClient.sendUserIntent({
+ *   inputTokens: [
+ *     {
+ *       chainId: 1n,
+ *       address: '0x...',
+ *     }
+ *   ],
+ *   outputTokens: [
+ *     {
+ *       chainId: 10n,
+ *       address: '0x...',
+ *       amount: 900000n,
+ *     }
+ *   ],
+ *   solTransaction: encodedTransactionMessage,
+ * })
  */
 export async function prepareUserIntent<
   account extends SmartAccount | undefined = SmartAccount | undefined,

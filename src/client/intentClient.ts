@@ -122,9 +122,6 @@ type IntentClientExtension = {
     signTransaction: (
       transaction: ByteArray,
     ) => Promise<Base64EncodedWireTransaction>;
-    sendTransaction: (
-      transaction: Base64EncodedWireTransaction,
-    ) => Promise<string>;
   };
 };
 
@@ -212,7 +209,7 @@ export type CreateIntentClientConfig<
  *   bundlerTransport: http(bundlerRpc),
  * });
  *
- * // Intent client that can send intents across any EVM / Solana chain using the @solana/kit SDK
+ * // Intent client that can send intents across any EVM / Solana chain using the `@solana/kit` SDK
  * const client = createIntentClient({
  *   account: kernelAccount,
  *   bundlerTransport: http(bundlerRpc),
@@ -235,7 +232,7 @@ export type CreateIntentClientConfig<
  *   },
  * });
  *
- * // Intent client that can send intents across any EVM / Solana chain using the @solana/web3js SDK
+ * // Intent client that can send intents across any EVM / Solana chain using the `@solana/web3js` SDK
  * // todo: Add guide around this
  * const client = createIntentClient({
  *   account: kernelAccount,
