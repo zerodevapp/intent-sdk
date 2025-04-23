@@ -21,6 +21,8 @@ export type GetIntentParameters = {
   // same-chain
   gasToken?: "SPONSORED" | "NATIVE";
   chainId?: number;
+  // 2d nonce
+  nonceKey?: bigint;
 };
 
 // The actual order type

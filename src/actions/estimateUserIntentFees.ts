@@ -38,6 +38,8 @@ export type EstimateUserIntentFeesParameters<
   }>;
   gasToken?: "SPONSORED" | "NATIVE";
   chainId?: number;
+  // 2d nonce
+  nonceKey?: bigint;
 };
 
 export type EstimateUserIntentFeesResult = {
@@ -121,7 +123,7 @@ export async function estimateUserIntentFees<
   ) as SmartAccount<KernelSmartAccountImplementation>;
 
   // Convert the user intent parameters to getIntent parameters
-  const { inputTokens, outputTokens, chainId, gasToken } = parameters;
+  const { inputTokens, outputTokens, chainId, gasToken, nonceKey } = parameters;
 
   // Get callData from either direct callData or encoded calls
   const callData = await (async () => {
@@ -157,6 +159,7 @@ export async function estimateUserIntentFees<
     chainId,
     initData,
     version,
+    nonceKey,
   };
   const result = await client.request({
     method: "ui_estimateIntentFees",
