@@ -18,6 +18,11 @@ import {
   type GetIntentReturnType,
   getIntent,
 } from "../../actions/getIntent.js";
+import {
+  type GetNonceParameters,
+  type GetNonceResult,
+  getNonce,
+} from "../../actions/getNonce.js";
 import { getUserIntentExecutionReceipt } from "../../actions/getUserIntentExecutionReceipt.js";
 import { getUserIntentOpenReceipt } from "../../actions/getUserIntentOpenReceipt.js";
 import {
@@ -58,6 +63,7 @@ export type IntentClientActions<
 > = {
   getIntent: (parameters: GetIntentParameters) => Promise<GetIntentReturnType>;
   getCAB: (parameters: GetCABParameters) => Promise<GetCABResult>;
+  getNonce: (parameters: GetNonceParameters) => Promise<GetNonceResult>;
   prepareUserIntent: <
     accountOverride extends SmartAccount | undefined = undefined,
     calls extends readonly unknown[] = readonly unknown[],
@@ -110,6 +116,7 @@ export function intentClientActions(
   return (client) => ({
     getIntent: (parameters) => getIntent(client, parameters, version),
     getCAB: (parameters) => getCAB(client, parameters),
+    getNonce: (parameters) => getNonce(client, parameters, version),
     prepareUserIntent: (parameters) =>
       prepareUserIntent(client, parameters, version),
     sendUserIntent: (parameters) => sendUserIntent(client, parameters, version),
