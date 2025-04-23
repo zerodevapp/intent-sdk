@@ -4,7 +4,12 @@ import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import { IntentVersionToAddressesMap } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 
-export type UserIntentStatus = "NOT_FOUND" | "PENDING" | "OPENED" | "EXECUTED";
+export type UserIntentStatus =
+  | "NOT_FOUND"
+  | "PENDING"
+  | "OPENED"
+  | "EXECUTED"
+  | "REFUNDED";
 
 export type Transaction = {
   chainId: number;
