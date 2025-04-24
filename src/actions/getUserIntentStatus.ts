@@ -24,6 +24,7 @@ export type GetUserIntentStatusResult = {
   status: UserIntentStatus;
   openTransaction?: Transaction;
   executionTransaction?: Transaction;
+  refundTransaction?: Transaction;
 };
 
 /**
