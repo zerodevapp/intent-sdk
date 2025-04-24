@@ -43,6 +43,7 @@ export type {
 export {
   INTENT_V0_2,
   INTENT_V0_3,
+  INTENT_V0_4,
   IntentVersionToAddressesMap,
 } from "./config/constants.js";
 export {
@@ -50,4 +51,7 @@ export {
   getInstallIntentExecutorCall,
   getIntentExecutorPluginData,
 } from "./utils/installIntentExecutor.js";
+export { getCustomNonceKeyFromString } from "./utils/getCustomNonceKeyFromString.js";
 export { getCAB } from "./actions/getCAB.js";
+
+export type { INTENT_VERSION_TYPE, UserIntentHash } from "./types/intent.js";

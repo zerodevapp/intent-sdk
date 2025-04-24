@@ -25,8 +25,13 @@ export const IntentVersionToAddressesMap: {
   "0.0.3": {
     intentExecutorAddress: "0xD0eb92AE315366A60527906B983A17Ae68aFCAE0",
   },
+  "0.0.4": {
+    intentExecutorAddress: "0xcFEB23Aa60fd674121A0e3C9bC24638dC3F58c0b",
+  },
 };
 
 export const INTENT_V0_2: INTENT_V1_VERSION_TYPE = "0.0.2";
 
 export const INTENT_V0_3: INTENT_V1_VERSION_TYPE = "0.0.3";
+
+export const INTENT_V0_4: INTENT_V1_VERSION_TYPE = "0.0.4";
