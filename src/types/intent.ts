@@ -7,3 +7,9 @@ export type INTENT_VERSION_TYPE = INTENT_V1_VERSION_TYPE;
 export type UserIntentHash = {
   uiHash: Hex;
 };
+
+export type GAS_TOKEN_TYPE =
+  | "SPONSORED"
+  | "NATIVE"
+  | "USDC"
+  | "USDT"
