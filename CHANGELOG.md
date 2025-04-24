@@ -1,5 +1,17 @@
 # @zerodev/intent
 
+## 0.0.25
+
+### Patch Changes
+
+- feat: add 0.0.4 address
+
+  - add 0.0.4 address
+
+  - support 2d nonce for version after 0.0.4
+
+  - add REFUNDED to intent status
+
 ## 0.0.24
 
 ### Patch Changes
