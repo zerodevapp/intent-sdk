@@ -19,7 +19,7 @@ import type {
 } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
-import type { INTENT_VERSION_TYPE } from "../types/intent.js";
+import type { GAS_TOKEN_TYPE, INTENT_VERSION_TYPE } from "../types/intent.js";
 
 export type EstimateUserIntentFeesParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
@@ -36,7 +36,7 @@ export type EstimateUserIntentFeesParameters<
     amount: bigint;
     chainId: number;
   }>;
-  gasToken?: "SPONSORED" | "NATIVE";
+  gasToken?: GAS_TOKEN_TYPE;
   chainId?: number;
   // 2d nonce
   nonceKey?: bigint;

@@ -1,7 +1,7 @@
 import type { Chain, Client, Hex, RpcErrorType, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
-import type { INTENT_VERSION_TYPE } from "../types/intent.js";
+import type { GAS_TOKEN_TYPE, INTENT_VERSION_TYPE } from "../types/intent.js";
 import { deepHexlify } from "../utils/deepHexlify.js";
 
 export type GetIntentParameters = {
@@ -19,7 +19,7 @@ export type GetIntentParameters = {
   }>;
   initData?: Hex | undefined;
   // same-chain
-  gasToken?: "SPONSORED" | "NATIVE";
+  gasToken?: GAS_TOKEN_TYPE;
   chainId?: number;
   // 2d nonce
   nonceKey?: bigint;
