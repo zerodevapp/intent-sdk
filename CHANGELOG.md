@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.26
+
+### Patch Changes
+
+- feat: add usdc/usdt gasToken
+
 ## 0.0.25
 
 ### Patch Changes

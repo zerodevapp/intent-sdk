@@ -8,8 +8,4 @@ export type UserIntentHash = {
   uiHash: Hex;
 };
 
-export type GAS_TOKEN_TYPE =
-  | "SPONSORED"
-  | "NATIVE"
-  | "USDC"
-  | "USDT"
+export type GAS_TOKEN_TYPE = "SPONSORED" | "NATIVE" | "USDC" | "USDT";
