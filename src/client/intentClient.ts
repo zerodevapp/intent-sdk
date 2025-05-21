@@ -1,6 +1,7 @@
 import {
   type KernelAccountClientActions,
   type SmartAccountClientConfig,
+  getUserOperationGasPrice,
   kernelAccountClientActions,
 } from "@zerodev/sdk";
 import {
@@ -228,6 +229,15 @@ export function createIntentClient(
         },
       }))
       .extend(intentClientActions(version)) as IntentClient;
+  }
+
+  if (!client.userOperation?.estimateFeesPerGas) {
+    client.userOperation = {
+      ...client.userOperation,
+      estimateFeesPerGas: async ({ bundlerClient }) => {
+        return await getUserOperationGasPrice(bundlerClient);
+      },
+    };
   }
 
   return client
