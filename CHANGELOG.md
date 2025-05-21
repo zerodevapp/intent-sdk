@@ -1,5 +1,11 @@
 # @zerodev/intent
 
+## 0.0.27
+
+### Patch Changes
+
+- fix: estimateFeesPerGas fallback
+
 ## 0.0.26
 
 ### Patch Changes
