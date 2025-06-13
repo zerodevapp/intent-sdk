@@ -5,6 +5,7 @@ import {
 } from "@zerodev/sdk";
 import type {
   Address,
+  Call,
   Chain,
   Client,
   ContractFunctionParameters,
@@ -15,7 +16,6 @@ import { concatHex, encodeFunctionData } from "viem";
 import type {
   PrepareUserOperationParameters,
   SmartAccount,
-  UserOperationCall,
 } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
@@ -131,15 +131,15 @@ export async function estimateUserIntentFees<
       return account.encodeCalls(
         parameters.calls.map((call_: unknown) => {
           const call = call_ as
-            | UserOperationCall
+            | Call
             | (ContractFunctionParameters & { to: Address; value: bigint });
           if ("abi" in call)
             return {
-              data: encodeFunctionData(call),
+              data: encodeFunctionData(call as ContractFunctionParameters),
               to: call.to,
               value: call.value,
-            } as UserOperationCall;
-          return call as UserOperationCall;
+            } as Call;
+          return call as Call;
         }),
       );
     return parameters.callData ?? "0x";

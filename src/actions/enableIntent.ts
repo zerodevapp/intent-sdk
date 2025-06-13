@@ -7,13 +7,9 @@ import {
   KERNEL_V3_2,
   KernelVersionToAddressesMap,
 } from "@zerodev/sdk/constants";
-import type { Chain, Client, Hash, PublicClient, Transport } from "viem";
+import type { Call, Chain, Client, Hash, PublicClient, Transport } from "viem";
 import { isAddressEqual } from "viem";
-import {
-  type SmartAccount,
-  type UserOperationCall,
-  sendUserOperation,
-} from "viem/account-abstraction";
+import { type SmartAccount, sendUserOperation } from "viem/account-abstraction";
 import { getAction } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
@@ -60,7 +56,7 @@ export async function enableIntent<
   );
 
   // Get calls
-  const calls: UserOperationCall[] = [];
+  const calls: Call[] = [];
 
   // Add upgrade call if needed
   if (!isV32) {

@@ -2,13 +2,13 @@ import { KernelV3_1AccountAbi } from "@zerodev/sdk";
 import type { PluginMigrationData } from "@zerodev/sdk/types";
 import {
   type Address,
+  type Call,
   concatHex,
   encodeAbiParameters,
   encodeFunctionData,
   parseAbiParameters,
   zeroAddress,
 } from "viem";
-import type { UserOperationCall } from "viem/account-abstraction";
 import { IntentVersionToAddressesMap } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE } from "../types/intent.js";
 
@@ -35,7 +35,7 @@ export const getInstallIntentExecutorCall = ({
 }: {
   accountAddress: Address;
   version: INTENT_VERSION_TYPE;
-}): UserOperationCall => {
+}): Call => {
   return {
     to: accountAddress,
     data: installIntentExecutor(version),

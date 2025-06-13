@@ -4,6 +4,7 @@ import {
 } from "@zerodev/sdk";
 import type {
   Address,
+  Call,
   Chain,
   Client,
   ContractFunctionParameters,
@@ -14,7 +15,6 @@ import { concatHex, encodeFunctionData } from "viem";
 import type {
   PrepareUserOperationParameters,
   SmartAccount,
-  UserOperationCall,
 } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
@@ -121,15 +121,15 @@ export async function prepareUserIntent<
       return account.encodeCalls(
         parameters.calls.map((call_: unknown) => {
           const call = call_ as
-            | UserOperationCall
+            | Call
             | (ContractFunctionParameters & { to: Address; value: bigint });
           if ("abi" in call)
             return {
-              data: encodeFunctionData(call),
+              data: encodeFunctionData(call as ContractFunctionParameters),
               to: call.to,
               value: call.value,
-            } as UserOperationCall;
-          return call as UserOperationCall;
+            } as Call;
+          return call as Call;
         }),
       );
     return parameters.callData ?? "0x";
@@ -138,6 +138,22 @@ export async function prepareUserIntent<
   const factoryAddress = account.factoryAddress;
   const factoryData = await account.generateInitCode();
   const initData = concatHex([factoryAddress, factoryData]);
+
+  // get authorization list
+  const authorization = await account.eip7702Authorization?.();
+
+  // get init call for 7702
+  const factoryArgs = await account.getFactoryArgs();
+  const initCalls7702: Call[] =
+    factoryArgs.factoryData && factoryArgs.factory === "0x7702"
+      ? [
+          {
+            to: account.address,
+            data: factoryArgs.factoryData,
+            value: 0n,
+          },
+        ]
+      : [];
 
   // Call getIntent with the converted parameters
   return getIntent(
@@ -151,6 +167,8 @@ export async function prepareUserIntent<
       chainId,
       initData,
       nonceKey,
+      authorizationList: authorization ? [authorization] : undefined,
+      initCalls7702,
     },
     version,
   );

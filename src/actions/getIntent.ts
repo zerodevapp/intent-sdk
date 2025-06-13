@@ -1,4 +1,12 @@
-import type { Chain, Client, Hex, RpcErrorType, Transport } from "viem";
+import type {
+  Call,
+  Chain,
+  Client,
+  Hex,
+  RpcErrorType,
+  SignedAuthorization,
+  Transport,
+} from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import type { GAS_TOKEN_TYPE, INTENT_VERSION_TYPE } from "../types/intent.js";
@@ -23,6 +31,9 @@ export type GetIntentParameters = {
   chainId?: number;
   // 2d nonce
   nonceKey?: bigint;
+  // 7702
+  authorizationList?: SignedAuthorization[];
+  initCalls7702?: Call[];
 };
 
 // The actual order type
