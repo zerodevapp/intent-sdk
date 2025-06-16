@@ -18,6 +18,8 @@ import {
   hashMessage,
   isAddressEqual,
   slice,
+  size,
+  isAddress,
 } from "viem";
 import {
   encodeAbiParameters,
@@ -144,10 +146,10 @@ const signOrders = async (
   };
 
   const identifier = account.kernelPluginManager.getIdentifier();
-  const sudoValidator = slice(identifier, 1);
+  const sudoValidator = size(identifier) > 1 ? slice(identifier, 1) : identifier;
 
   // multi-chain ecdsa validator
-  if (isAddressEqual(sudoValidator, MULTI_CHAIN_ECDSA_VALIDATOR_ADDRESS)) {
+  if (isAddress(sudoValidator) && isAddressEqual(sudoValidator, MULTI_CHAIN_ECDSA_VALIDATOR_ADDRESS)) {
     return signOrderMultichain(orders);
   }
 
