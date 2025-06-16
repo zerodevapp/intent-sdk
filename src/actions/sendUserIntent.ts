@@ -16,10 +16,10 @@ import {
   type Transport,
   concatHex,
   hashMessage,
-  isAddressEqual,
-  slice,
-  size,
   isAddress,
+  isAddressEqual,
+  size,
+  slice,
 } from "viem";
 import {
   encodeAbiParameters,
@@ -32,6 +32,10 @@ import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import { V2_SAME_CHAIN_ORDER_DATA_TYPE } from "../config/constants.js";
 import type { INTENT_VERSION_TYPE, UserIntentHash } from "../types/intent.js";
+import {
+  get7702InitCalls,
+  getAuthorization,
+} from "../utils/getAuthorizationList.js";
 import type {
   GaslessCrossChainOrder,
   GetIntentReturnType,
@@ -146,10 +150,14 @@ const signOrders = async (
   };
 
   const identifier = account.kernelPluginManager.getIdentifier();
-  const sudoValidator = size(identifier) > 1 ? slice(identifier, 1) : identifier;
+  const sudoValidator =
+    size(identifier) > 1 ? slice(identifier, 1) : identifier;
 
   // multi-chain ecdsa validator
-  if (isAddress(sudoValidator) && isAddressEqual(sudoValidator, MULTI_CHAIN_ECDSA_VALIDATOR_ADDRESS)) {
+  if (
+    isAddress(sudoValidator) &&
+    isAddressEqual(sudoValidator, MULTI_CHAIN_ECDSA_VALIDATOR_ADDRESS)
+  ) {
     return signOrderMultichain(orders);
   }
 
@@ -189,12 +197,22 @@ export async function sendUserIntent<
     account_,
   ) as unknown as SmartAccount<KernelSmartAccountImplementation>;
 
+  // get parameters with 7702
+  const authorization = await getAuthorization(account);
+  const initCalls7702 = await get7702InitCalls(account);
+
+  const prepareParamsWith7702 = {
+    ...prepareParams,
+    authorizationList: authorization ? [authorization] : undefined,
+    initCalls7702,
+  };
+
   // Get or prepare the order
   const intent =
     existingIntent ??
     (await prepareUserIntent(
       client,
-      prepareParams as PrepareUserIntentParameters<
+      prepareParamsWith7702 as PrepareUserIntentParameters<
         account,
         accountOverride,
         calls
@@ -224,6 +242,8 @@ export async function sendUserIntent<
             order: order,
             signature,
             version,
+            authorizationList: authorization ? [authorization] : undefined,
+            initCalls7702,
           },
         ],
       });

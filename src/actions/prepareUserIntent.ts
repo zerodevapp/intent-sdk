@@ -9,6 +9,7 @@ import type {
   Client,
   ContractFunctionParameters,
   Hex,
+  SignedAuthorization,
   Transport,
 } from "viem";
 import { concatHex, encodeFunctionData } from "viem";
@@ -19,6 +20,10 @@ import type {
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
 import type { GAS_TOKEN_TYPE, INTENT_VERSION_TYPE } from "../types/intent.js";
+import {
+  get7702InitCalls,
+  getAuthorization,
+} from "../utils/getAuthorizationList.js";
 import type { GetIntentReturnType } from "./getIntent.js";
 import { getIntent } from "./getIntent.js";
 
@@ -41,6 +46,9 @@ export type PrepareUserIntentParameters<
   chainId?: number;
   // 2d nonce
   nonceKey?: bigint;
+  // 7702
+  authorizationList?: SignedAuthorization[];
+  initCalls7702?: Call[];
 };
 
 export type PrepareUserIntentResult = GetIntentReturnType;
@@ -105,7 +113,11 @@ export async function prepareUserIntent<
   parameters: PrepareUserIntentParameters<account, accountOverride, calls>,
   version: INTENT_VERSION_TYPE,
 ): Promise<PrepareUserIntentResult> {
-  const { account: account_ = client.account } = parameters;
+  const {
+    account: account_ = client.account,
+    authorizationList: authorizationList_,
+    initCalls7702: initCalls7702_,
+  } = parameters;
   if (!account_) throw new AccountNotFoundError();
 
   const account = parseAccount(
@@ -140,20 +152,12 @@ export async function prepareUserIntent<
   const initData = concatHex([factoryAddress, factoryData]);
 
   // get authorization list
-  const authorization = await account.eip7702Authorization?.();
+  const authorization = authorizationList_
+    ? undefined
+    : await getAuthorization(account);
 
   // get init call for 7702
-  const factoryArgs = await account.getFactoryArgs();
-  const initCalls7702: Call[] =
-    factoryArgs.factoryData && factoryArgs.factory === "0x7702"
-      ? [
-          {
-            to: account.address,
-            data: factoryArgs.factoryData,
-            value: 0n,
-          },
-        ]
-      : [];
+  const initCalls7702 = initCalls7702_ ?? (await get7702InitCalls(account));
 
   // Call getIntent with the converted parameters
   return getIntent(
@@ -167,7 +171,8 @@ export async function prepareUserIntent<
       chainId,
       initData,
       nonceKey,
-      authorizationList: authorization ? [authorization] : undefined,
+      authorizationList:
+        authorizationList_ ?? (authorization ? [authorization] : undefined),
       initCalls7702,
     },
     version,
