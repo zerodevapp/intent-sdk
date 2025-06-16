@@ -5,6 +5,9 @@ import type { SmartAccount } from "viem/account-abstraction";
 export const getAuthorization = async (
   account: SmartAccount<KernelSmartAccountImplementation>,
 ): Promise<SignedAuthorization | undefined> => {
+  if (!account.authorization) {
+    return undefined;
+  }
   return await account.eip7702Authorization?.();
 };
 
