@@ -8,7 +8,7 @@ export const getAuthorization = async (
   if (!account.authorization) {
     return undefined;
   }
-  return await account.eip7702Authorization?.();
+  return await account.eip7702Authorization?.({ useReplayableSignature: true });
 };
 
 export const get7702InitCalls = async (

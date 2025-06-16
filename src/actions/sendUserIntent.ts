@@ -2,6 +2,7 @@ import { MULTI_CHAIN_ECDSA_VALIDATOR_ADDRESS } from "@zerodev/multi-chain-ecdsa-
 import {
   AccountNotFoundError,
   type KernelSmartAccountImplementation,
+  deepHexlify,
   eip712WrapHash,
 } from "@zerodev/sdk";
 import {
@@ -243,7 +244,9 @@ export async function sendUserIntent<
             signature,
             version,
             authorizationList: authorization ? [authorization] : undefined,
-            initCalls7702,
+            initCalls7702: initCalls7702
+              ? deepHexlify(initCalls7702)
+              : undefined,
           },
         ],
       });
