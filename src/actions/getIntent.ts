@@ -34,6 +34,7 @@ export type GetIntentParameters = {
   // 7702
   authorizationList?: SignedAuthorization[];
   initCalls7702?: Call[];
+  delegated7702?: Hex;
 };
 
 // The actual order type

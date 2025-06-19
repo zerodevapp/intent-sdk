@@ -12,7 +12,7 @@ import type {
   SignedAuthorization,
   Transport,
 } from "viem";
-import { concatHex, encodeFunctionData } from "viem";
+import { concat, concatHex, encodeFunctionData } from "viem";
 import type {
   PrepareUserOperationParameters,
   SmartAccount,
@@ -147,16 +147,18 @@ export async function prepareUserIntent<
     return parameters.callData ?? "0x";
   })();
 
+  const isEip7702 = account.eip7702Authorization;
+  const implementation = account.accountImplementationAddress;
   const factoryAddress = account.factoryAddress;
   const factoryData = await account.generateInitCode();
   const initData = concatHex([factoryAddress, factoryData]);
 
-  // get authorization list
+  // get authorization list and init call for 7702 on destination chain
+  const destinationChainId =
+    outputTokens && outputTokens.length > 0 ? outputTokens[0].chainId : chainId;
   const authorization = authorizationList_
     ? undefined
-    : await getAuthorization(account);
-
-  // get init call for 7702
+    : await getAuthorization(account, destinationChainId);
   const initCalls7702 = initCalls7702_ ?? (await get7702InitCalls(account));
 
   // Call getIntent with the converted parameters
@@ -174,6 +176,9 @@ export async function prepareUserIntent<
       authorizationList:
         authorizationList_ ?? (authorization ? [authorization] : undefined),
       initCalls7702,
+      delegated7702: isEip7702
+        ? concat(["0xef0100", implementation])
+        : undefined,
     },
     version,
   );

@@ -190,6 +190,9 @@ export async function sendUserIntent<
   const {
     account: account_ = client.account,
     intent: existingIntent,
+    chainId,
+    authorizationList: authorizationList_,
+    initCalls7702: initCalls7702_,
     ...prepareParams
   } = parameters;
   if (!account_) throw new AccountNotFoundError();
@@ -198,13 +201,19 @@ export async function sendUserIntent<
     account_,
   ) as unknown as SmartAccount<KernelSmartAccountImplementation>;
 
-  // get parameters with 7702
-  const authorization = await getAuthorization(account);
-  const initCalls7702 = await get7702InitCalls(account);
+  // get parameters with 7702 on destination chain
+  const authorizationDest =
+    !authorizationList_ && (await getAuthorization(account, chainId));
+  const authorizationDestList = authorizationList_
+    ? authorizationList_
+    : authorizationDest
+      ? [authorizationDest]
+      : undefined;
+  const initCalls7702 = initCalls7702_ ?? (await get7702InitCalls(account));
 
   const prepareParamsWith7702 = {
     ...prepareParams,
-    authorizationList: authorization ? [authorization] : undefined,
+    authorizationList: authorizationDestList,
     initCalls7702,
   };
 
@@ -233,6 +242,21 @@ export async function sendUserIntent<
     signature: signatures[index],
   }));
 
+  // get authorization list on src chains
+  let authorizationSrc = authorizationDestList;
+  if (!authorizationSrc) {
+    for (const order of intent.orders) {
+      const authorization = await getAuthorization(
+        account,
+        Number(order.originChainId),
+      );
+      if (authorization) {
+        authorizationSrc = [authorization];
+        break;
+      }
+    }
+  }
+
   // Send the signed orders to the relayer
   const uiHashes = await Promise.all(
     ordersWithSig.map(async ({ order, signature }) => {
@@ -243,7 +267,7 @@ export async function sendUserIntent<
             order: order,
             signature,
             version,
-            authorizationList: authorization ? [authorization] : undefined,
+            authorizationList: authorizationSrc,
             initCalls7702: initCalls7702
               ? deepHexlify(initCalls7702)
               : undefined,
