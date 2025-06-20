@@ -202,8 +202,19 @@ export async function sendUserIntent<
   ) as unknown as SmartAccount<KernelSmartAccountImplementation>;
 
   // get parameters with 7702 on destination chain
+  const { outputTokens } = prepareParams;
+  const outputTokens_ = outputTokens as unknown as Array<{
+    address: Hex;
+    amount: bigint;
+    chainId: number;
+  }>;
+  const destinationChainId =
+    outputTokens_ && outputTokens_.length > 0
+      ? outputTokens_[0].chainId
+      : chainId;
   const authorizationDest =
-    !authorizationList_ && (await getAuthorization(account, chainId));
+    !authorizationList_ &&
+    (await getAuthorization(account, destinationChainId));
   const authorizationDestList = authorizationList_
     ? authorizationList_
     : authorizationDest
