@@ -1,4 +1,4 @@
-import type { Hex } from "viem";
+import type { Address, Hex } from "viem";
 
 export type INTENT_V1_VERSION_TYPE = "0.0.2" | "0.0.3" | "0.0.4";
 
@@ -9,3 +9,9 @@ export type UserIntentHash = {
 };
 
 export type GAS_TOKEN_TYPE = "SPONSORED" | "NATIVE" | "USDC" | "USDT";
+
+export type PaymentToken = {
+  address: Address;
+  amount: bigint;
+  chainId: number;
+};
