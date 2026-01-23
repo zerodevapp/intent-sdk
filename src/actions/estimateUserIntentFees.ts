@@ -19,7 +19,11 @@ import type {
 } from "viem/account-abstraction";
 import { parseAccount } from "viem/utils";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
-import type { GAS_TOKEN_TYPE, INTENT_VERSION_TYPE } from "../types/intent.js";
+import type {
+  GAS_TOKEN_TYPE,
+  INTENT_VERSION_TYPE,
+  PaymentToken,
+} from "../types/intent.js";
 
 export type EstimateUserIntentFeesParameters<
   account extends SmartAccount | undefined = SmartAccount | undefined,
@@ -43,16 +47,8 @@ export type EstimateUserIntentFeesParameters<
 };
 
 export type EstimateUserIntentFeesResult = {
-  inputPaymentTokens: Array<{
-    address: Address;
-    amount: bigint;
-    chainId: number;
-  }>;
-  gasPaymentTokens: Array<{
-    address: Address;
-    amount: bigint;
-    chainId: number;
-  }>;
+  inputPaymentTokens: Array<PaymentToken>;
+  gasPaymentTokens: Array<PaymentToken>;
 };
 
 /**

@@ -1,7 +1,11 @@
 import type { Chain, Client, Hex, RpcErrorType, Transport } from "viem";
 import type { SmartAccount } from "viem/account-abstraction";
 import type { CombinedIntentRpcSchema } from "../client/intentClient.js";
-import type { GAS_TOKEN_TYPE, INTENT_VERSION_TYPE } from "../types/intent.js";
+import type {
+  GAS_TOKEN_TYPE,
+  INTENT_VERSION_TYPE,
+  PaymentToken,
+} from "../types/intent.js";
 import { deepHexlify } from "../utils/deepHexlify.js";
 
 export type GetIntentParameters = {
@@ -40,6 +44,8 @@ export type GaslessCrossChainOrder = {
 // Return type alias for the getIntent action
 export type GetIntentReturnType = {
   orders: Array<GaslessCrossChainOrder>;
+  inputPaymentTokens: Array<PaymentToken>;
+  gasPaymentTokens: Array<PaymentToken>;
 };
 
 export type GetIntentErrorType = RpcErrorType;
